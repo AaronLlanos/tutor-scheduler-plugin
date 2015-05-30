@@ -15,8 +15,23 @@
 if ( !current_user_can( 'manage_options' ) )  {
 	wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 }
+
+//Grab the students
+global $wpdb;
+
 ?>
 
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
 
-<h1><?php echo get_admin_page_title(); ?></h1>
+<!-- Create a header in the default WordPress 'wrap' container -->
+<div class="wrap bootstrap-wpadmin">
+
+     <!-- Add the icon to the page -->
+    <h2><span class="dashicons dashicons-calendar-alt"></span> &nbsp; <?php echo get_admin_page_title(); ?></h2>
+    <hr>
+
+    <!-- Main page content here. -->
+    <p>Woohoo, the start of something awesome!</p>
+
+
+</div><!-- /.wrap -->

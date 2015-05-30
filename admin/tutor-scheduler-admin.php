@@ -63,6 +63,7 @@ class Tutor_Scheduler_Admin {
 		$this->top_level_slug = $top_level_slug;
 		$this->student_slug = $student_slug;
 		$this->courses_slug = $courses_slug;
+		$this->error_message = '';
 
 	}
 
@@ -84,7 +85,6 @@ class Tutor_Scheduler_Admin {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/plugin-name-admin.css', array(), $this->version, 'all' );
 
 	}
@@ -116,7 +116,9 @@ class Tutor_Scheduler_Admin {
 
 	public function load_top_level_display(){
 
-		include_once 'partials/top-level-display.php';
+		if (!include_once 'partials/top-dashboard-display.php'){
+			echo $this->get_error_message();
+		}
 
 	}
 
@@ -124,13 +126,17 @@ class Tutor_Scheduler_Admin {
 
 	public function load_manage_courses_page(){
 
-		 include_once 'partials/manage-courses-display.php';
+		 if (!include_once 'partials/manage-courses-display.php'){
+		 	echo $this->get_error_message();
+		 }
 		
 	}
 
 	public function load_manage_students_page(){
 
-		 include_once 'partials/manage-students-display.php';
+		 if (!include_once 'partials/manage-students-display.php'){
+		 	echo $this->get_error_message();
+		 }
 		
 	}
 
@@ -197,6 +203,13 @@ class Tutor_Scheduler_Admin {
 			array( $this, 'load_manage_students_page' )
  		);
 	
+	}
+
+	public function get_error_message(){
+			$this->error_message .= '<div class="wrap bootstrap-wpadmin">';
+			$this->error_message .= 	'<div class="alert alert-danger" role="alert">Error: Something went wrong</div>';
+			$this->error_message .= '</div>';
+			return $this->error_message;
 	}
 
 }

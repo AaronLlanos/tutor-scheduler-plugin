@@ -2,3 +2,22 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+
+h2 > span.dashicons.dashicons-calendar-alt{
+	height: 40px;
+	width: 40px;
+	font-size: 40px;
+}
+
+.tas-admin-card{
+	background-color: #FFF;
+	box-shadow: 1px 1px 3px #274160;
+	margin-bottom: 15px;
+	padding: 10px;
+}
+/**
+ * Overide!
+ */
+#wpwrap {
+  /*background-image: url("../images/plugin_background.jpg");*/
+}
