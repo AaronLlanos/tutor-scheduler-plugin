@@ -58,6 +58,8 @@ class Tutor_Scheduler {
 		$this->plugin_name = 'tutor-appointment-scheduler';
 		$this->version = '1.0.0';
 		$this->slug_name = 'tutor-scheduler';
+		$this->student_slug = 'tutor-scheduler-students';
+		$this->courses_slug = 'tutor-scheduler-courses';
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
@@ -138,7 +140,13 @@ class Tutor_Scheduler {
 	private function define_admin_hooks() {
 
 
-		$plugin_admin = new Tutor_Scheduler_Admin( $this->get_plugin_name(), $this->get_version(), $this->get_plugin_slug_name() );
+		$plugin_admin = new Tutor_Scheduler_Admin( 
+								$this->get_plugin_name(),
+								$this->get_version(),
+								$this->get_plugin_slug_name(),
+								$this->get_student_slug_name(), 
+								$this->get_courses_slug_name()
+						);
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
@@ -182,6 +190,28 @@ class Tutor_Scheduler {
 	 */
 	public function get_plugin_slug_name() {
 		return $this->slug_name;
+	}
+
+	/**
+	 * The slug_name of the plugin used to uniquely identify it within the context of
+	 * WordPress and to define internationalization functionality.
+	 *
+	 * @since     1.0.0
+	 * @return    string    The slug_name of the plugin.
+	 */
+	public function get_student_slug_name() {
+		return $this->student_slug;
+	}
+
+	/**
+	 * The slug_name of the plugin used to uniquely identify it within the context of
+	 * WordPress and to define internationalization functionality.
+	 *
+	 * @since     1.0.0
+	 * @return    string    The slug_name of the plugin.
+	 */
+	public function get_courses_slug_name() {
+		return $this->courses_slug;
 	}
 
 

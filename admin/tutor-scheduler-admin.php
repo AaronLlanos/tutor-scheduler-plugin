@@ -56,11 +56,13 @@ class Tutor_Scheduler_Admin {
 	 * @param      string    $plugin_name       The name of this plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version, $top_level_slug ) {
+	public function __construct( $plugin_name, $version, $top_level_slug, $student_slug, $courses_slug ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		$this->top_level_slug = $top_level_slug;
+		$this->student_slug = $student_slug;
+		$this->courses_slug = $courses_slug;
 
 	}
 
@@ -110,6 +112,28 @@ class Tutor_Scheduler_Admin {
 
 	}
 
+
+
+	public function load_top_level_display(){
+
+		include_once 'partials/top-level-display.php';
+
+	}
+
+
+
+	public function load_manage_courses_page(){
+
+		 include_once 'partials/manage-courses-display.php';
+		
+	}
+
+	public function load_manage_students_page(){
+
+		 include_once 'partials/manage-students-display.php';
+		
+	}
+
 	/**
 	 * Build the custom menu for the admin menu bar.
 	 * 
@@ -127,8 +151,16 @@ class Tutor_Scheduler_Admin {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-		
-		add_menu_page( 'Tutor Appointment Scheduler', 'LCAE Tutor Scheduler', 'manage_options', $this->top_level_slug, array($this, 'load_admin_page'), 'dashicons-calendar-alt' );
+		add_menu_page( 
+			'Tutor Appointment Scheduler',
+			'LCAE Tutor Scheduler',
+			'manage_options',
+			$this->top_level_slug,
+			array( $this, 'load_top_level_display' ),
+			'dashicons-calendar-alt',
+			null
+		);
+
 	}
 
 	/**
@@ -138,7 +170,14 @@ class Tutor_Scheduler_Admin {
 	 */
 	public function register_courses_submenu(){
 		
-		add_submenu_page( $this->top_level_slug, 'Manage Courses', 'Manage Courses', 'manage_options', 'tutor-scheduler-manage-courses', array($this, 'load_manage_courses_page') );
+		add_submenu_page( 
+			$this->top_level_slug,
+			'Manage Courses',
+			'Manage Courses',
+			'manage_options',
+			$this->courses_slug,
+			array( $this, 'load_manage_courses_page' ) 
+		);
 	
 	}
 
@@ -149,26 +188,15 @@ class Tutor_Scheduler_Admin {
 	 */
 	public function register_students_submenu(){
 		
-		add_submenu_page( $this->top_level_slug, 'Manage Students', 'Manage Students', 'manage_options', 'tutor-scheduler-manage-students', array($this, 'load_manage_students_page') );
+		add_submenu_page( 
+			$this->top_level_slug,
+			'Manage Students',
+			'Manage Students',
+			'manage_options',
+			$this->student_slug,		
+			array( $this, 'load_manage_students_page' )
+ 		);
 	
-	}
-
-	private function load_admin_page(){
-
-		return plugin_dir_url( __FILE__ ) . 'partials/top-level-display.php';
-
-	}
-
-	private function load_manage_courses_page(){
-
-		return plugin_dir_url( __FILE__ ) . 'partials/manage-courses-display.php';
-		
-	}
-
-	private function load_manage_students_page(){
-
-		return plugin_dir_url( __FILE__ ) . 'partials/manage-students-display.php';
-		
 	}
 
 }
