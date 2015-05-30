@@ -10,8 +10,8 @@
  * version of the plugin.
   *
  * @since      1.0.0
- * @package    Tutor_Appointment_Scheduler
- * @subpackage Tutor_Appointment_Scheduler/includes
+ * @package    tutor-appointment-scheduler
+ * @subpackage tutor-appointment-scheduler/includes
  * @author     Aaron Llanos <aaronllanos93@gmail.com>
  */
 class Tutor_Scheduler {
@@ -142,7 +142,9 @@ class Tutor_Scheduler {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_custom_menu' );
+		$this->loader->add_action( 'admin_menu', $plugin_admin, 'register_parent_custom_menu' );
+		$this->loader->add_action( 'admin_menu', $plugin_admin, 'register_courses_submenu' );
+		$this->loader->add_action( 'admin_menu', $plugin_admin, 'register_students_submenu' );
 
 	}
 

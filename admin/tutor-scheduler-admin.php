@@ -45,9 +45,9 @@ class Tutor_Scheduler_Admin {
 	 *
 	 * @since    1.0.0
 	 * @access   private
-	 * @var      string    $slug_name    The slug name of this plugin.
+	 * @var      string    $top_level_slug    The slug name of this plugin.
 	 */
-	private $slug_name;
+	private $top_level_slug;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -56,11 +56,11 @@ class Tutor_Scheduler_Admin {
 	 * @param      string    $plugin_name       The name of this plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version, $slug_name ) {
+	public function __construct( $plugin_name, $version, $top_level_slug ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-		$this->slug_name = $slug_name;
+		$this->top_level_slug = $top_level_slug;
 
 	}
 
@@ -110,7 +110,12 @@ class Tutor_Scheduler_Admin {
 
 	}
 
-	public function add_custom_menu(){
+	/**
+	 * Build the custom menu for the admin menu bar.
+	 * 
+	 * @since    1.0.0    Build the custom menu for the admin menu bar.
+	 */
+	public function register_parent_custom_menu(){
 		/**
 		 * This function adds the menu to the worpress dashboard.
 		 * 
@@ -123,7 +128,46 @@ class Tutor_Scheduler_Admin {
 		 * class.
 		 */
 		
-		add_menu_page('Tutor Appointment Scheduler', 'LCAE Tutor Scheduler', 'manage_options', $this->slug_name, array(), 'dashicons-calendar-alt');
+		add_menu_page( 'Tutor Appointment Scheduler', 'LCAE Tutor Scheduler', 'manage_options', $this->top_level_slug, array($this, 'load_admin_page'), 'dashicons-calendar-alt' );
+	}
+
+	/**
+	 * Build the custom menu for the admin menu bar.
+	 * 
+	 * @since    1.0.0    Build the custom menu for the admin menu bar.
+	 */
+	public function register_courses_submenu(){
+		
+		add_submenu_page( $this->top_level_slug, 'Manage Courses', 'Manage Courses', 'manage_options', 'tutor-scheduler-manage-courses', array($this, 'load_manage_courses_page') );
+	
+	}
+
+	/**
+	 * Build the custom menu for the admin menu bar.
+	 * 
+	 * @since    1.0.0    Build the custom menu for the admin menu bar.
+	 */
+	public function register_students_submenu(){
+		
+		add_submenu_page( $this->top_level_slug, 'Manage Students', 'Manage Students', 'manage_options', 'tutor-scheduler-manage-students', array($this, 'load_manage_students_page') );
+	
+	}
+
+	private function load_admin_page(){
+
+		return plugin_dir_url( __FILE__ ) . 'partials/top-level-display.php';
+
+	}
+
+	private function load_manage_courses_page(){
+
+		return plugin_dir_url( __FILE__ ) . 'partials/manage-courses-display.php';
+		
+	}
+
+	private function load_manage_students_page(){
+
+		return plugin_dir_url( __FILE__ ) . 'partials/manage-students-display.php';
 		
 	}
 
