@@ -34,28 +34,28 @@ if ( ! defined( 'WPINC' ) ) {
  * The code that runs during plugin activation.
  * This action is documented in includes/class-plugin-name-activator.php
  */
-function activate_plugin_name() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-plugin-name-activator.php';
-	Plugin_Name_Activator::activate();
+function activate_tutor_scheduler() {
+	require_once plugin_dir_path( __FILE__ ) . 'includes/tutor-scheduler-activator.php';
+	Tutor_Scheduler_Activator::activate();
 }
 
 /**
  * The code that runs during plugin deactivation.
- * This action is documented in includes/class-plugin-name-deactivator.php
+ * This action is documented in includes/tutor-scheduler-deactivator.php
  */
-function deactivate_plugin_name() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-plugin-name-deactivator.php';
-	Plugin_Name_Deactivator::deactivate();
+function deactivate_tutor_scheduler() {
+	require_once plugin_dir_path( __FILE__ ) . 'includes/tutor-scheduler-deactivator.php';
+	Tutor_Scheduler_Deactivator::deactivate();
 }
 
-register_activation_hook( __FILE__, 'activate_plugin_name' );
-register_deactivation_hook( __FILE__, 'deactivate_plugin_name' );
+register_activation_hook( __FILE__, 'activate_tutor_scheduler' );
+register_deactivation_hook( __FILE__, 'deactivate_tutor_scheduler' );
 
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/class-plugin-name.php';
+require plugin_dir_path( __FILE__ ) . 'includes/tutor-scheduler.php';
 
 /**
  * Begins execution of the plugin.
@@ -66,10 +66,10 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-plugin-name.php';
  *
  * @since    1.0.0
  */
-function run_plugin_name() {
+function run_tutor_scheduler() {
 
-	$plugin = new Plugin_Name();
+	$plugin = new Tutor_Scheduler();
 	$plugin->run();
 
 }
-run_plugin_name();
+run_tutor_scheduler();
