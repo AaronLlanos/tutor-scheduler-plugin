@@ -13,14 +13,15 @@
 class Tutor_Scheduler_Activator {
 
 	/**
-	 * Short Description. (use period)
+	 * Activate all appropriate tables if none in $wpdb.
 	 *
-	 * Long Description.
+	 * This function will go through the $wpdb and check to see if the apprpriate tables are available. 
+	 * This insures the plugin runs queries successfully later on.
 	 *
 	 * @since    1.0.0
 	 */
 	public static function activate() {
-
+		
 	}
 
 }

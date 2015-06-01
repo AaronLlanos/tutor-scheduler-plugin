@@ -56,13 +56,15 @@ class Tutor_Scheduler_Admin {
 	 * @param      string    $plugin_name       The name of this plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version, $top_level_slug, $student_slug, $courses_slug ) {
+	public function __construct( $plugin_name, $version, $top_level_slug, $student_slug, $courses_slug, $tutor_table_name, $courses_table_name ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		$this->top_level_slug = $top_level_slug;
 		$this->student_slug = $student_slug;
 		$this->courses_slug = $courses_slug;
+		$this->$tutor_table_name = $tutor_table_name;
+		$this->$courses_table_name = $courses_table_name;
 		$this->error_message = '';
 
 	}
@@ -85,7 +87,7 @@ class Tutor_Scheduler_Admin {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/plugin-name-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/tutor-scheduler-admin.css', array(), $this->version, 'all' );
 
 	}
 
@@ -108,10 +110,9 @@ class Tutor_Scheduler_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/plugin-name-admin.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/tutor-scheduler-admin.js', array( 'jquery' ), $this->version, false );
 
 	}
-
 
 
 	public function load_top_level_display(){
@@ -211,5 +212,29 @@ class Tutor_Scheduler_Admin {
 			$this->error_message .= '</div>';
 			return $this->error_message;
 	}
+
+	/**
+	 * [get_tutor_courses description]
+	 * @return 	array|boolean return array of tutor courses on success. Else, return false.
+	 */
+	public function get_tutor_courses(){
+		$query = "
+			SELECT *
+			FROM " . $this->courses_table_name . "
+		";
+		$courses = $wpdb->get_results($query);
+
+		return $courses;
+	}
+
+	// public function get_tutor_students(){
+	// 	$query = "
+	// 		SELECT *
+	// 		FROM " . Tutor_Scheduler::get_tutors_table_name() . "
+	// 	";
+	// 	$courses = $wpdb->get_results($query);
+
+	// 	return $courses;
+	// }
 
 }

@@ -60,6 +60,8 @@ class Tutor_Scheduler {
 		$this->slug_name = 'tutor-scheduler';
 		$this->student_slug = 'tutor-scheduler-students';
 		$this->courses_slug = 'tutor-scheduler-courses';
+		$this->courses_table_name = 'tutor-scheduler-courses';
+		$this->tutors_table_name = 'tutor-scheduler-tutors';
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
@@ -84,6 +86,16 @@ class Tutor_Scheduler {
 	 * @access   private
 	 */
 	private function load_dependencies() {
+
+		/**
+		 * The class responsible for checking and making sure that all of the appropriate tables
+		 * are loaded for the plugin to work properly.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/tutor-scheduler-table-installer.php';
+
+		if (!Tutor_Scheduler_Table_Installer::check_database( $this->get_courses_table_name(), $this->get_tutors_table_name() )){
+			Tutor_Scheduler_Table_Installer::install_tables( $this->get_courses_table_name(), $this->get_tutors_table_name() );
+		}
 
 		/**
 		 * The class responsible for orchestrating the actions and filters of the
@@ -145,7 +157,9 @@ class Tutor_Scheduler {
 								$this->get_version(),
 								$this->get_plugin_slug_name(),
 								$this->get_student_slug_name(), 
-								$this->get_courses_slug_name()
+								$this->get_courses_slug_name(),
+								$this->get_tutors_table_name(), 
+								$this->get_courses_table_name()
 						);
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
@@ -244,6 +258,14 @@ class Tutor_Scheduler {
 	 */
 	public function get_version() {
 		return $this->version;
+	}
+
+	public function get_courses_table_name(){
+		return $this->courses_table_name;
+	}
+
+	public function get_tutors_table_name(){
+		return $this->tutors_table_name;
 	}
 
 }

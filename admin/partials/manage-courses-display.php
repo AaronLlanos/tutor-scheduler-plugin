@@ -17,7 +17,7 @@ if ( !current_user_can( 'manage_options' ) )  {
 }
 
 //Grab the courses
-global $wpdb;
+$courses = Tutor_Scheduler_Admin::get_tutor_courses();
 
 ?>
 
@@ -32,6 +32,7 @@ global $wpdb;
 
     <!-- Main page content here. -->
     <p>Woohoo, the start of something awesome!</p>
+    <?php echo typeof $courses; ?>
 
 
 </div><!-- /.wrap -->
