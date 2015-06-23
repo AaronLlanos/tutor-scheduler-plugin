@@ -17,7 +17,7 @@ if ( !current_user_can( 'manage_options' ) )  {
 }
 
 //Grab the courses
-$courses = Tutor_Scheduler_Admin::get_tutor_courses();
+$courses = $this->get_tutor_courses();
 
 ?>
 
@@ -31,8 +31,41 @@ $courses = Tutor_Scheduler_Admin::get_tutor_courses();
     <hr>
 
     <!-- Main page content here. -->
-    <p>Woohoo, the start of something awesome!</p>
-    <?php echo typeof $courses; ?>
 
+	<div class="row">
+		<div class="col-xs-6">
+			<form class="tas-admin-card" action>
+				<div class="form-group">
+				 	<label for="add-course">Add a Course</label>
+				 	<input type="text" class="form-control" id="add-course" placeholder="Ex: UGS 303">
+				 	<button type="submit" class="btn btn-success">Add Course</button>
+				</div>
+			</form>
+		</div>
+		<div class="col-xs-6 tas-admin-card">
+    		<h4><?php echo "Number of Courses: ".count($courses); ?></h4>
+			<table class="table table-striped table-hover">
+				<thead>
+					<tr>
+						<th>Course Name</th>
+						<th>Date Added</th>
+						<th><span class="dashicons dashicons-trash"></span></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php 
+						foreach ($courses as $course) {
+							echo "<tr>";
+								echo "<td>" . $course['name'] . "</td>";
+								echo "<td>" . $course['date_added'] . "</td>";
+							echo "</tr>";
+						}
+					 ?>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	
 
 </div><!-- /.wrap -->

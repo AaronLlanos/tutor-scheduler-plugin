@@ -60,8 +60,8 @@ class Tutor_Scheduler {
 		$this->slug_name = 'tutor-scheduler';
 		$this->student_slug = 'tutor-scheduler-students';
 		$this->courses_slug = 'tutor-scheduler-courses';
-		$this->courses_table_name = 'tutor-scheduler-courses';
-		$this->tutors_table_name = 'tutor-scheduler-tutors';
+		$this->courses_table_name = 'tutor_scheduler_courses';
+		$this->tutors_table_name = 'tutor_scheduler_tutors';
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
@@ -261,11 +261,13 @@ class Tutor_Scheduler {
 	}
 
 	public function get_courses_table_name(){
-		return $this->courses_table_name;
+		global $wpdb;
+		return $wpdb->prefix . $this->courses_table_name;
 	}
 
 	public function get_tutors_table_name(){
-		return $this->tutors_table_name;
+		global $wpdb;
+		return $wpdb->prefix . $this->tutors_table_name;
 	}
 
 }

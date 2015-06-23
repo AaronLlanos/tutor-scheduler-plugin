@@ -218,10 +218,13 @@ class Tutor_Scheduler_Admin {
 	 * @return 	array|boolean return array of tutor courses on success. Else, return false.
 	 */
 	public function get_tutor_courses(){
+		global $wpdb;
+
 		$query = "
 			SELECT *
 			FROM " . $this->courses_table_name . "
 		";
+
 		$courses = $wpdb->get_results($query);
 
 		return $courses;
