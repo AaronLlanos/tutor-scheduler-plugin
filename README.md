@@ -57,11 +57,11 @@ Answer to foo bar dilemma.
 == Screenshots ==
 
 1. Dashboard Screenshot:
-![Dashboard Screenshot](/assets/screenshots/1.jpg?raw=true "Dashboard Screenshot")
+![Dashboard Screenshot](/assets/screenshots/1.png?raw=true "Dashboard Screenshot")
 2. Manage Courses Screenshot:
-![Manage Courses Screenshot](/assets/screenshots/2.jpg?raw=true "Manage Courses Screenshot")
+![Manage Courses Screenshot](/assets/screenshots/2.png?raw=true "Manage Courses Screenshot")
 3. Manage Tutors Screenshot:
-![Manage Tutors Screenshot](/assets/screenshots/3.jpg?raw=true "Manage Tutors Screenshot")
+![Manage Tutors Screenshot](/assets/screenshots/3.png?raw=true "Manage Tutors Screenshot")
 
 
 == Changelog ==
