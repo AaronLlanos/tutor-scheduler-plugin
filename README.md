@@ -1,4 +1,4 @@
-=== LCAE Tutor Scheduler ===
+***=== LCAE Tutor Scheduler ===
 Contributors: Aaron Llanos
 Donate link: paypal id: al26593@gmail.com
 Tags: scheduler, tutor, lcae
@@ -10,7 +10,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Tutor Scheduler for LCAE scholarship office. 
 
-== Description ==
+**== Description ==
 
 This tutoring scheduler was created so that the LCAE office at The University of Texas at Austin would have an efficient way for their students to book tutoring appointments .
 
@@ -34,7 +34,7 @@ that lacks those changes -- as long as the trunk's `readme.txt` points to the co
     If no stable tag is provided, it is assumed that trunk is stable, but you should specify "trunk" if that's where
 you put the stable version, in order to eliminate any doubt.
 
-== Installation ==
+**== Installation ==
 
 This section describes how to install the plugin and get it working.
 
