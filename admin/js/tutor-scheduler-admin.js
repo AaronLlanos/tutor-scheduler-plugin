@@ -27,7 +27,7 @@ var CourseManager = {
 		 */
 		$("#add-course").keypress(function(event){
 			if ( event.which == 13 ) {
-				inputValue = $("#add-course").val();
+				var inputValue = $("#add-course").val();
 				CourseManager.validateCourses(inputValue);
 				$("#temp-course-table").prepend(CourseManager.addCourseFormat(inputValue, true));
 				$("#temp-course-table").prepend('<tr class="success"><td>'+inputValue+'</td></tr>');
