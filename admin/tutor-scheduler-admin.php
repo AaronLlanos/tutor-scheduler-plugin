@@ -63,8 +63,8 @@ class Tutor_Scheduler_Admin {
 		$this->top_level_slug = $top_level_slug;
 		$this->student_slug = $student_slug;
 		$this->courses_slug = $courses_slug;
-		$this->$tutor_table_name = $tutor_table_name;
-		$this->$courses_table_name = $courses_table_name;
+		$this->tutor_table_name = $tutor_table_name;
+		$this->courses_table_name = $courses_table_name;
 		$this->error_message = '';
 
 	}
@@ -220,6 +220,8 @@ class Tutor_Scheduler_Admin {
 	public function get_tutor_courses(){
 		global $wpdb;
 
+ 		// echo '<script type="text/javascript">console.log("Courses table name =  ' . $this->courses_table_name . '");</script>';
+		
 		$query = "
 			SELECT *
 			FROM " . $this->courses_table_name . "
@@ -227,7 +229,7 @@ class Tutor_Scheduler_Admin {
 
 		$courses = $wpdb->get_results($query);
 
-		return $courses;
+		return json_encode($courses);
 	}
 
 	// public function get_tutor_students(){

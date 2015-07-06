@@ -88,16 +88,6 @@ class Tutor_Scheduler {
 	private function load_dependencies() {
 
 		/**
-		 * The class responsible for checking and making sure that all of the appropriate tables
-		 * are loaded for the plugin to work properly.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/tutor-scheduler-table-installer.php';
-
-		if (!Tutor_Scheduler_Table_Installer::check_database( $this->get_courses_table_name(), $this->get_tutors_table_name() )){
-			Tutor_Scheduler_Table_Installer::install_tables( $this->get_courses_table_name(), $this->get_tutors_table_name() );
-		}
-
-		/**
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
@@ -150,7 +140,6 @@ class Tutor_Scheduler {
 	 * @access   private
 	 */
 	private function define_admin_hooks() {
-
 
 		$plugin_admin = new Tutor_Scheduler_Admin( 
 								$this->get_plugin_name(),

@@ -1,32 +1,55 @@
+
+/**
+ * Functions for adding courses to student scheduler
+ */
+var CourseManager = {
+	tempCourses: [],
+	validateCourses: function(){
+		//Should make sure there are no duplicates.
+		return true;
+	},
+	addCourseFormat: function(inputValue, addVal){
+		if (addVal){
+			return '<input id="'+inputValue+'" type="text" class="form-control hidden" value="add" name="'+inputValue+'">';
+		}else{
+			return '<input id="'+inputValue+'" type="text" class="form-control hidden" value="remove" name="'+inputValue+'">';
+		}
+	}
+};
+
 (function( $ ) {
 	'use strict';
 
-	/**
-	 * All of the code for your admin-specific JavaScript source
-	 * should reside in this file.
-	 *
-	 * Note that this assume you're going to use jQuery, so it prepares
-	 * the $ function reference to be used within the scope of this
-	 * function.
-	 *
-	 * From here, you're able to define handlers for when the DOM is
-	 * ready:
-	 *
-	 * $(function() {
-	 *
-	 * });
-	 *
-	 * Or when the window is loaded:
-	 *
-	 * $( window ).load(function() {
-	 *
-	 * });
-	 *
-	 * ...and so on.
-	 *
-	 * Remember that ideally, we should not attach any more than a single DOM-ready or window-load handler
-	 * for any particular page. Though other scripts in WordPress core, other plugins, and other themes may
-	 * be doing this, we should try to minimize doing that in our own work.
-	 */
+	$( window ).load(function(){
+
+		/**
+		 * Course Manager Functions!!!!!!
+		 */
+		$("#add-course").keypress(function(event){
+			if ( event.which == 13 ) {
+				inputValue = $("#add-course").val();
+				CourseManager.validateCourses(inputValue);
+				$("#temp-course-table").prepend(CourseManager.addCourseFormat(inputValue, true));
+				$("#temp-course-table").prepend('<tr class="success"><td>'+inputValue+'</td></tr>');
+				$("#add-course").val("");
+			}
+			
+		});
+		$(".course-remove").on("click", function(){
+			var confirmedVal = confirm("Are you sure you want to remove "+$(this).attr("data-name")+" from the table?");
+			if (confirmedVal == true) {
+				//Remove the course from the table
+				$(this).parent().parent().addClass("danger");
+				$("#temp-course-table").prepend(CourseManager.addCourseFormat($(this).attr("data-courseID"), false));
+				$("#temp-course-table").prepend('<tr class="danger"><td>'+$(this).attr("data-name")+'</td></tr>');
+			}
+		});
+
+		/**
+		 * Course Tutor Functions!
+		 */
+		
+
+	});
 
 })( jQuery );
