@@ -18,43 +18,7 @@ if ( !current_user_can( 'manage_options' ) )  {
 
 $updateMessage = '';
 if (count($_POST) > 0){
-	global $wpdb;
-	
-	/**
-	 * Track to see if there were any errors while inserting into table
-	 * @var boolean
-	 */
-	$insertError = false;
-	$table = $wpdb->prefix . 'tutor_scheduler_courses';
-	$format = array('%s', '%s', '%d' );
-	$date_added = date('Y-m-d H:i:s');
-
-	foreach ($_POST as $key => $value) {
-		if ($value == "add"){
-			$data = array( 'date_added' => $date_added, 'name' => $key, 'tutor_count' => 0);
-
-			//Error check
-			if (!$wpdb->insert( $table, $data, $format )) {
-		 		$insertError = true;
-			}
-		}else{
-			$data = array( 'ID' => $key );
-			//Error check
-			if (!$wpdb->delete( $table, $data ) ) {
-		 		$insertError = true;
-			}
-		}
-	}
-
-	if (!$insertError){
-		$updateMessage .= '<div class="alert alert-success" role="alert">';
-		$updateMessage .= 	'Success: All updates have been made successfully!';
-		$updateMessage .= '</div>';
-	}else{
-		$updateMessage .= '<div class="alert alert-danger" role="alert">';
-		$updateMessage .= 	'Error: There was a problem inserting the courses into the table.';
-		$updateMessage .= '</div>';
-	}
+	$this->getUpdateMessage($updateMessage, $this->executePostRequest());
 }
 
 //Grab the courses
@@ -104,18 +68,7 @@ $courses = json_decode($this->get_tutor_courses(), true);
 					</tr>
 				</thead>
 				<tbody>
-					<?php 
-						foreach ($courses as $course) {
-							// var_dump($course);
-							echo "<tr>";
-								echo "<td>" . $course["name"] . "</td>";
-								echo "<td>" . $course["date_added"] . "</td>";
-								echo "<td>" . $course["tutor_count"] . "</td>";
-								echo '<td><button class="btn btn-xs btn-danger course-remove" data-name="' . $course["name"] . '" data-courseID="' . $course["id"] . '">X</button></td>';
-							echo "</tr>";
-						}
-					 ?>
-
+					<?php echo $this->coursesToString($courses); ?>
 				</tbody>
 			</table>
 		</div>

@@ -232,6 +232,65 @@ class Tutor_Scheduler_Admin {
 		return json_encode($courses);
 	}
 
+	public function getUpdateMessage($updateMessage, $insertSuccess){
+		if ($insertSuccess){
+			$updateMessage .= '<div class="alert alert-success" role="alert">';
+			$updateMessage .= 	'Success: All updates have been made successfully!';
+			$updateMessage .= '</div>';
+		}else{
+			$updateMessage .= '<div class="alert alert-danger" role="alert">';
+			$updateMessage .= 	'Error: There was a problem inserting the courses into the table.';
+			$updateMessage .= '</div>';
+		}
+		return $updateMessage;
+	}
+
+	public function executePostRequest() {
+		global $wpdb;
+	
+		/**
+		 * Track to see if there were any errors while inserting into table
+		 * @var boolean
+		 */
+		$insertSuccess = true;
+		$table = $wpdb->prefix . 'tutor_scheduler_courses';
+		$format = array('%s', '%s', '%d' );
+		$date_added = date('Y-m-d H:i:s');
+
+		foreach ($_POST as $key => $value) {
+			if ($value == "add"){
+				$data = array( 'date_added' => $date_added, 'name' => $key, 'tutor_count' => 0);
+
+				//Error check
+				if (!$wpdb->insert( $table, $data, $format )) {
+			 		$insertSuccess = false;
+				}
+			}else{
+				$data = array( 'ID' => $key );
+				//Error check
+				if (!$wpdb->delete( $table, $data ) ) {
+			 		$insertSuccess = false;
+				}
+			}
+		}
+
+		return $insertSuccess;
+	}
+
+	public function coursesToString($courses){
+		$coursesString = '';
+		foreach ($courses as $course) {
+			// var_dump($course);
+			$coursesString .= "<tr>";
+				$coursesString .= "<td>" . $course["name"] . "</td>";
+				$coursesString .= "<td>" . $course["date_added"] . "</td>";
+				$coursesString .= "<td>" . $course["tutor_count"] . "</td>";
+				$coursesString .= '<td><button class="btn btn-xs btn-danger course-remove" data-name="' . $course["name"] . '" data-courseID="' . $course["id"] . '">X</button></td>';
+			$coursesString .= "</tr>";
+		}
+
+		return $coursesString;
+	}
 	// public function get_tutor_students(){
 	// 	$query = "
 	// 		SELECT *
