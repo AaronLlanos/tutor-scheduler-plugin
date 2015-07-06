@@ -35,6 +35,7 @@ if ( ! defined( 'WPINC' ) ) {
  * This action is documented in includes/class-plugin-name-activator.php
  */
 function activate_tutor_scheduler() {
+
 	require_once plugin_dir_path( __FILE__ ) . 'includes/tutor-scheduler-activator.php';
 	Tutor_Scheduler_Activator::activate();
 }
