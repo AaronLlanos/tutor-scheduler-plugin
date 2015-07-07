@@ -36,12 +36,12 @@ var CourseManager = {
 			
 		});
 		$(".course-remove").on("click", function(){
-			var confirmedVal = confirm("Are you sure you want to remove "+$(this).attr("data-name")+" from the table?");
+			var confirmedVal = confirm("Are you sure you want to remove "+$(this).data("name")+" from the table?");
 			if (confirmedVal == true) {
 				//Remove the course from the table
 				$(this).parent().parent().addClass("danger");
-				$("#temp-course-table").prepend(CourseManager.addCourseFormat($(this).attr("data-courseID"), false));
-				$("#temp-course-table").prepend('<tr class="danger"><td>'+$(this).attr("data-name")+'</td></tr>');
+				$("#temp-course-table").prepend(CourseManager.addCourseFormat($(this).data("courseID"), false));
+				$("#temp-course-table").prepend('<tr class="danger"><td>'+$(this).data("name")+'</td></tr>');
 			}
 		});
 

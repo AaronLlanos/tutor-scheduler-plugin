@@ -57,9 +57,9 @@ $courses = json_decode($this->get_tutor_courses(), true);
 			</form>
 		</div>
 		<div class="col-xs-6 tas-admin-card">
-    		<h4><?php echo "Number of Courses: ".count($courses); ?></h4>
+    		<h4><?php echo "Number of Courses: ". count($courses); ?></h4>
 			<table class="table table-striped table-hover">
-				<thead>
+				<thead> 
 					<tr>
 						<th>Course Name</th>
 						<th>Date Added</th>
