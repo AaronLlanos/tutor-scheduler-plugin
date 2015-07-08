@@ -16,9 +16,9 @@ if ( !current_user_can( 'manage_options' ) )  {
 	wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 }
 
-$updateMessage = '';
 if (count($_POST) > 0){
-	$this->getUpdateMessage($updateMessage, $this->executePostRequest());
+	$insertSuccess = $this->executePostRequest();
+	$updateMessage = $this->getUpdateMessage($updateMessage, $insertSuccess);
 }
 
 //Grab the courses

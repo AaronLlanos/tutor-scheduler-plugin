@@ -25,7 +25,7 @@ class Tutor_Scheduler_Activator {
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		global $wpdb;
 		global $tsp_db_version;
-		$wpdb->show_errors( true );
+		// $wpdb->show_errors( true );
 
 		$tsp_db_version = '1.0';
 
@@ -40,7 +40,7 @@ class Tutor_Scheduler_Activator {
 			name  tinytext DEFAULT '' NOT NULL,
 			tutor_count  mediumint(9) DEFAULT 0 NOT NULL,
 			PRIMARY KEY  id (id)
-		);";
+		); $charset_collate";
 
 		$tutors_sql = "CREATE TABLE $tutors_table_name (
 			id  mediumint(9) NOT NULL AUTO_INCREMENT,
@@ -48,7 +48,7 @@ class Tutor_Scheduler_Activator {
 			name  tinytext NOT NULL,
 			tutor_count  mediumint(9) NOT NULL,
 			PRIMARY KEY  id (id)
-		);";
+		); $charset_collate";
 
 		dbDelta( $courses_sql );
  		// echo $wpdb->last_error;

@@ -259,7 +259,7 @@ class Tutor_Scheduler_Admin {
 
 		foreach ($_POST as $key => $value) {
 			if ($value == "add"){
-				$data = array( 'date_added' => $date_added, 'name' => $key, 'tutor_count' => 0);
+				$data = array( 'date_added' => $date_added, 'name' => str_replace('_', ' ', $key), 'tutor_count' => 0);
 
 				//Error check
 				if (!$wpdb->insert( $table, $data, $format )) {
