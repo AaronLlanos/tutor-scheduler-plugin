@@ -39,9 +39,11 @@ $courses = json_decode($this->get_tutor_courses(), true);
 	<div class="row">
 		<div class="col-xs-6">
 			<div class="tas-admin-card form-group">
-				<label for="add-course">Add a Course</label>
-				<input type="text" class="form-control" id="add-course" placeholder="Ex: UGS 303 then hit enter" autofocus><br>
-				<button type="button" class="btn btn-success">Add Course</button>
+				<form>
+					<label for="add-course">Add a Course</label>
+					<input type="text" class="form-control" id="add-course" placeholder="Ex: UGS 303 then hit enter" autofocus required><br>
+					<button type="button" class="btn btn-success">Add Course</button>
+				</form>
 			</div>
 			<form enctype="multipart/form-data" id="course-form" class="tas-admin-card" method="POST" action="<?php echo admin_url('admin.php?page=' . $this->courses_slug . ''); ?>">
 				<div class="form-group">
