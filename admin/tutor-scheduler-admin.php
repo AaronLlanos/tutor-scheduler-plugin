@@ -232,6 +232,22 @@ class Tutor_Scheduler_Admin {
 		return json_encode($courses);
 	}
 
+
+	public function get_tutor_students(){
+		global $wpdb;
+
+ 		// echo '<script type="text/javascript">console.log("Courses table name =  ' . $this->tutor_table_name . '");</script>';
+		
+		$query = "
+			SELECT *
+			FROM " . $this->tutor_table_name . "
+		";
+
+		$tutors = $wpdb->get_results($query);
+
+		return json_encode($tutors);
+	}
+
 	public function getUpdateMessage($updateMessage, $insertSuccess){
 		if ($insertSuccess){
 			$updateMessage .= '<div class="alert alert-success" role="alert">';
@@ -291,14 +307,5 @@ class Tutor_Scheduler_Admin {
 
 		return $coursesString;
 	}
-	// public function get_tutor_students(){
-	// 	$query = "
-	// 		SELECT *
-	// 		FROM " . Tutor_Scheduler::get_tutors_table_name() . "
-	// 	";
-	// 	$courses = $wpdb->get_results($query);
-
-	// 	return $courses;
-	// }
 
 }
