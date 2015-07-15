@@ -127,17 +127,17 @@ class Tutor_Scheduler_Admin {
 
 	public function load_manage_courses_page(){
 
-		 if (!include_once 'partials/manage-courses-display.php'){
-		 	echo $this->get_error_message();
-		 }
+		require_once 'partials/courses-manager/courses-manager.php';
+		$coursesManager = new CoursesManager($this->courses_table_name, $this->courses_slug);
+		$coursesManager->run();
 		
 	}
 
 	public function load_manage_students_page(){
 
-		 if (!include_once 'partials/manage-students-display.php'){
-		 	echo $this->get_error_message();
-		 }
+		require_once 'partials/tutor-manager/tutor-manager.php';
+		$tutorManager = new TutorManager($this->tutor_table_name, $this->courses_slug, $this->courses_table_name);
+		$tutorManager->run();
 		
 	}
 
@@ -213,40 +213,7 @@ class Tutor_Scheduler_Admin {
 			return $this->error_message;
 	}
 
-	/**
-	 * [get_tutor_courses description]
-	 * @return 	array|boolean return array of tutor courses on success. Else, return false.
-	 */
-	public function get_tutor_courses(){
-		global $wpdb;
 
- 		// echo '<script type="text/javascript">console.log("Courses table name =  ' . $this->courses_table_name . '");</script>';
-		
-		$query = "
-			SELECT *
-			FROM " . $this->courses_table_name . "
-		";
-
-		$courses = $wpdb->get_results($query);
-
-		return json_encode($courses);
-	}
-
-
-	public function get_tutor_students(){
-		global $wpdb;
-
- 		// echo '<script type="text/javascript">console.log("Courses table name =  ' . $this->tutor_table_name . '");</script>';
-		
-		$query = "
-			SELECT *
-			FROM " . $this->tutor_table_name . "
-		";
-
-		$tutors = $wpdb->get_results($query);
-
-		return json_encode($tutors);
-	}
 
 	public function getUpdateMessage($updateMessage, $insertSuccess){
 		if ($insertSuccess){
@@ -261,51 +228,24 @@ class Tutor_Scheduler_Admin {
 		return $updateMessage;
 	}
 
-	public function executePostRequest() {
-		global $wpdb;
-	
-		/**
-		 * Track to see if there were any errors while inserting into table
-		 * @var boolean
+	/**
+		 * [get_tutor_courses description]
+		 * @return 	array|boolean return array of tutor courses on success. Else, return false.
 		 */
-		$insertSuccess = true;
-		$table = $wpdb->prefix . 'tutor_scheduler_courses';
-		$format = array('%s', '%s', '%d' );
-		$date_added = date('Y-m-d H:i:s');
+		public function get_tutor_courses(){
+			global $wpdb;
 
-		foreach ($_POST as $key => $value) {
-			if ($value == "add"){
-				$data = array( 'date_added' => $date_added, 'name' => str_replace('_', ' ', $key), 'tutor_count' => 0);
+	 		// echo '<script type="text/javascript">console.log("Courses table name =  ' . $this->courses_table_name . '");</script>';
+			
+			$query = "
+				SELECT *
+				FROM " . $this->courses_table_name . "
+				ORDER BY name
+			";
 
-				//Error check
-				if (!$wpdb->insert( $table, $data, $format )) {
-			 		$insertSuccess = false;
-				}
-			}else{
-				$data = array( 'ID' => $key );
-				//Error check
-				if (!$wpdb->delete( $table, $data ) ) {
-			 		$insertSuccess = false;
-				}
-			}
+			$courses = $wpdb->get_results($query);
+
+			return json_encode($courses);
 		}
-
-		return $insertSuccess;
-	}
-
-	public function coursesToString($courses){
-		$coursesString = '';
-		foreach ($courses as $course) {
-			// var_dump($course);
-			$coursesString .= "<tr>";
-				$coursesString .= "<td>" . $course["name"] . "</td>";
-				$coursesString .= "<td>" . $course["date_added"] . "</td>";
-				$coursesString .= "<td>" . $course["tutor_count"] . "</td>";
-				$coursesString .= '<td><button class="btn btn-xs btn-danger course-remove" data-name="' . $course["name"] . '" data-courseID="' . $course["id"] . '">X</button></td>';
-			$coursesString .= "</tr>";
-		}
-
-		return $coursesString;
-	}
 
 }

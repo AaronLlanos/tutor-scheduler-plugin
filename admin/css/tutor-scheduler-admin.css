@@ -15,6 +15,14 @@ h2 > span.dashicons.dashicons-calendar-alt{
 	margin-bottom: 15px;
 	padding: 10px;
 }
+
+.tas-admin-card-full{
+	height: 100%;
+}
+
+table#courses{
+	height: 80px;
+}
 /**
  * Overide!
  */

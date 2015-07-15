@@ -16,14 +16,6 @@ if ( !current_user_can( 'manage_options' ) )  {
 	wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 }
 
-if (count($_POST) > 0){
-	$insertSuccess = $this->executePostRequest();
-	$updateMessage = $this->getUpdateMessage($updateMessage, $insertSuccess);
-}
-
-//Grab the courses
-$courses = json_decode($this->get_tutor_courses(), true);
-
 ?>
 
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
