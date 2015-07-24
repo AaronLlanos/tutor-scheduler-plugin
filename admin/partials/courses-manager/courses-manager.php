@@ -21,15 +21,13 @@
 			require_once 'manage-courses-display.php';
 		}
 
-		public function executePostRequest() {
-			global $wpdb;
-		
+		public function executePostRequest() {		
 			/**
 			 * Track to see if there were any errors while inserting into table
 			 * @var boolean
 			 */
 			$insertSuccess = true;
-			$table = $wpdb->prefix . 'tutor_scheduler_courses';
+			$table = $this->courses_table_name;
 			$format = array('%s', '%s', '%d' );
 			$date_added = date('Y-m-d H:i:s');
 

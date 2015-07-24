@@ -88,7 +88,11 @@ class Tutor_Scheduler_Admin {
 		 * class.
 		 */
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/tutor-scheduler-admin.css', array(), $this->version, 'all' );
-
+		//Bootstrap
+		wp_enqueue_style( 'bootstrap', plugin_dir_url( __FILE__ ) . 'css/bootstrap.min.css', array(), $this->version, 'all' );
+		//FullCalendar
+		wp_enqueue_style( 'fullcalendar', plugin_dir_url( __FILE__ ) . 'css/full-calendar.min.css', array(), $this->version, 'all' );
+		
 	}
 
 	/**
@@ -110,8 +114,15 @@ class Tutor_Scheduler_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/tutor-scheduler-admin.js', array( 'jquery' ), $this->version, false );
+		//Moment.js
+		wp_enqueue_script( 'moment', plugin_dir_url( __FILE__ ) . 'js/moment.min.js', array(), '2.10.3', false );
 
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/tutor-scheduler-admin.js', array( 'jquery' ), $this->version, false );
+		//Bootstrap
+		wp_enqueue_script( 'bootstrap', plugin_dir_url( __FILE__ ) . 'js/bootstrap.min.js', array( 'jquery' ), $this->version, false );
+		//FullCalendar
+		wp_enqueue_script( 'fullcalendar', plugin_dir_url( __FILE__ ) . 'js/full-calendar.min.js', array( 'jquery', 'moment' ), $this->version, false );
+		
 	}
 
 
@@ -136,7 +147,7 @@ class Tutor_Scheduler_Admin {
 	public function load_manage_students_page(){
 
 		require_once 'partials/tutor-manager/tutor-manager.php';
-		$tutorManager = new TutorManager($this->tutor_table_name, $this->courses_slug, $this->courses_table_name);
+		$tutorManager = new TutorManager($this->tutor_table_name, $this->student_slug, $this->courses_table_name);
 		$tutorManager->run();
 		
 	}

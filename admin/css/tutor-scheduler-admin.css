@@ -20,12 +20,17 @@ h2 > span.dashicons.dashicons-calendar-alt{
 	height: 100%;
 }
 
-table#courses{
-	height: 80px;
+.table-scroll {
+  height: 230px;
+  overflow-y: auto;
 }
 /**
  * Overide!
  */
 #wpwrap {
-  /*background-image: url("../images/plugin_background.jpg");*/
+  background-color: rgb(240, 240, 240) !important;
+}
+
+#wpfooter{
+	position: inherit !important
 }

@@ -66,7 +66,17 @@
 		/**
 		 * Course Tutor Functions!
 		 */
-		
+		 $('#fullcalendar').fullCalendar({
+	        // put your options and callbacks here
+	        weekends: false
+	    });
+		$("input.course-highlight-checkbox").on("click", function(event){
+			if ($(this).context.checked) {
+				$(this).parent().parent().addClass("success");
+			}else{
+				$(this).parent().parent().removeClass("success");
+			}
+		});
 
 	});
 

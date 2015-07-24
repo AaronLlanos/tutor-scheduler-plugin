@@ -12,10 +12,6 @@
  * @subpackage tutor-appointment-scheduler/admin/partials
  */
 
-if ( !current_user_can( 'manage_options' ) )  {
-	wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
-}
-
 ?>
 
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
@@ -32,12 +28,13 @@ if ( !current_user_can( 'manage_options' ) )  {
 		<div class="tas-admin-card">
     		<?php require_once 'tutor-table.php'; ?>
 		</div>
-	</div>
+	<!-- Tab List -->
 	<ul id="myTabs" class="nav nav-tabs" role="tablist">
 		<li role="presentation" class="active"><a aria-controls="home" role="tab" data-toggle="tab" href="#add-student">Add Tutor</a></li>
 		<li role="presentation"><a aria-controls="manage-tutor-courses" role="tab" data-toggle="tab" href="#manage-tutor-courses">Manage Tutor Courses</a></li>
 		<li role="presentation"><a aria-controls="manage-tutor" role="tab" data-toggle="tab" href="#manage-tutor">Manage Tutor(s)</a></li>
 	</ul>
+	<!-- Tab Content -->
 	<div class="tab-content tas-admin-card">
 		<div role="tabpanel" id="add-student" class="tab-pane fade in active">
 			<?php require_once 'add-student-form.php'; ?>
@@ -50,8 +47,6 @@ if ( !current_user_can( 'manage_options' ) )  {
 		</div>
 	</div>
 
-</div>
 
-	
 
 </div><!-- /.wrap -->
