@@ -59,6 +59,9 @@
 		</div>
 	</div>
 	<hr>
+	<div class="container">
+		<div id='fullcalendar'></div>
+	</div>
+	<hr>
 	<input type="submit" class="btn btn-success" value="Add Student">
 </form>
-<div id='fullcalendar'></div>

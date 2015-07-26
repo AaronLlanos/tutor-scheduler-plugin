@@ -25,6 +25,13 @@ h2 > span.dashicons.dashicons-calendar-alt{
   overflow-y: auto;
 }
 /**
+ * Full calendar
+ */
+.calendar-highlight{
+	border-color: rgb(250, 0, 0) !important;
+}
+
+/**
  * Overide!
  */
 #wpwrap {
@@ -34,3 +41,5 @@ h2 > span.dashicons.dashicons-calendar-alt{
 #wpfooter{
 	position: inherit !important
 }
+
+
