@@ -13,6 +13,9 @@
 
 		public function run()
 		{
+			if ( !current_user_can( 'manage_options' ) )  {
+				wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
+			}
 			if (count($_POST) > 0){
 				$insertSuccess = $this->executePostRequest();
 				$updateMessage = $this->getUpdateMessage($updateMessage, $insertSuccess);
@@ -21,7 +24,8 @@
 			require_once 'manage-courses-display.php';
 		}
 
-		public function executePostRequest() {		
+		public function executePostRequest() {	
+			global $wpdb;	
 			/**
 			 * Track to see if there were any errors while inserting into table
 			 * @var boolean
@@ -48,6 +52,7 @@
 				}
 			}
 
+			echo "execture post";
 			return $insertSuccess;
 		}
 
