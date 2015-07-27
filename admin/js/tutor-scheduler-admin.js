@@ -38,6 +38,12 @@
 	};
 
 	var FullCalendar = {
+
+		deleteEvent: function(calEvent){
+			$("#fullcalendar").fullCalendar('removeEvents', function(event){
+				return event == calEvent;
+			});
+		},
 		addNewEvent: function(date){
 
 			var tutorName = $("#first-name").val() + " " + $("#last-name").val();
@@ -46,9 +52,9 @@
 				var eventObject = {
 					title: "Tutoring with " + tutorName,
 					start: date.format(),
-					end: date.add({minutes: 30}),
+					end: date.add({hours: 1}),
 					description: "Tutoring with " + tutorName,
-					editable: false
+					editable: true
 				}
 		        $("#fullcalendar").fullCalendar('renderEvent', eventObject, true);
 			}else{
@@ -100,13 +106,16 @@
 	        columnFormat: 'dddd',
 	        allDaySlot: false,
 	        height: "auto",
-	        minTime: "08:00:00",
+	        minTime: "12:00:00",
 	        maxTime: "19:00:00",
 	        timezone: "America/Chicago",
 	        weekends: false,
 	        defaultView: 'agendaWeek',
 	        dayClick: function(date, jsEvent, view) {
 	        	FullCalendar.addNewEvent(date);
+		    },
+		    eventClick: function(calEvent, jsEvent, view) {
+		    	FullCalendar.deleteEvent(calEvent);
 		    }
 	    });
 		$("input.course-highlight-checkbox").on("click", function(event){

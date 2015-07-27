@@ -227,6 +227,7 @@ class Tutor_Scheduler_Admin {
 
 
 	public function getUpdateMessage($updateMessage, $insertSuccess){
+		echo "getUpdateMessage";
 		if ($insertSuccess){
 			$updateMessage .= '<div class="alert alert-success" role="alert">';
 			$updateMessage .= 	'Success: All updates have been made successfully!';

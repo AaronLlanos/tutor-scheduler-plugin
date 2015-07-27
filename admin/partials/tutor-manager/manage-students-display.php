@@ -28,6 +28,7 @@
 		<div class="tas-admin-card">
     		<?php require_once 'tutor-table.php'; ?>
 		</div>
+	</div>
 	<!-- Tab List -->
 	<ul id="myTabs" class="nav nav-tabs" role="tablist">
 		<li role="presentation" class="active"><a aria-controls="home" role="tab" data-toggle="tab" href="#add-student">Add Tutor</a></li>
