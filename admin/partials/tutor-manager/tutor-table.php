@@ -4,10 +4,9 @@
 		<tr>
 			<th>First Name</th>
 			<th>Last Name</th>
-			<th>Major</th>
 			<th>Email</th>
-			<th>Date Added</th>
-			<th>Tutor Courses</th>
+			<th>Major</th>
+			<th># Courses</th>
 			<th><span class="dashicons dashicons-trash"></span></th>
 		</tr>
 	</thead>

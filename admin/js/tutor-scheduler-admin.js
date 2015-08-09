@@ -38,6 +38,28 @@
 	};
 
 	var FullCalendar = {
+		newCalendar: function () {
+			var self = this;
+			$('#fullcalendar').fullCalendar({
+		        // put your options and callbacks here
+		        editable: true,
+		        header: false,
+		        columnFormat: 'dddd',
+		        allDaySlot: false,
+		        height: "auto",
+		        minTime: "12:00:00",
+		        maxTime: "19:00:00",
+		        timezone: "America/Chicago",
+		        weekends: false,
+		        defaultView: 'agendaWeek',
+		        dayClick: function(date, jsEvent, view) {
+		        	self.addNewEvent(date);
+			    },
+			    eventClick: function(calEvent, jsEvent, view) {
+			    	self.deleteEvent(calEvent);
+			    }
+		    });
+		},
 
 		deleteEvent: function(calEvent){
 			$("#fullcalendar").fullCalendar('removeEvents', function(event){
@@ -50,7 +72,7 @@
 			//Assume no name is less than 4 charactersl, including the space seperating first and last
 			if (tutorName.length > 4){
 				var eventObject = {
-					title: "Tutoring with " + tutorName,
+					title: tutorName,
 					start: date.format(),
 					end: date.add({hours: 1}),
 					description: "Tutoring with " + tutorName,
@@ -61,6 +83,42 @@
 				alert("Please enter a name before scheduling times.")
 				$("#first-name").focus();
 			}
+
+		}
+	}
+
+	var TutorScheduler = {
+		serializeCourses: function(){
+			var coursesArray = $("#courses-table").find(".success");
+			var courses = [];
+
+			coursesArray.each(function(i, course){
+				courses.push($(course).find("input").attr("data-courseID"));
+			});
+			$("input#courses").val(courses.toString());
+			// console.log("The courses val is:"); //Debug
+			// console.log($("input#courses").val());
+
+			return true;
+		},
+		serializeDates: function(scheduledDates){
+			var schedule = '';
+			var newCalObject = {};
+
+			$(scheduledDates).each(function(i, calObject){
+				newCalObject = {
+									start: calObject.start.format(),
+									end: calObject.end.format(),
+									title: calObject.title,
+									description: calObject.description
+								};
+				schedule += JSON.stringify(newCalObject)+", ";
+
+			});
+
+			$("input#schedule").val(schedule);
+			
+			return true;
 
 		}
 	}
@@ -95,30 +153,22 @@
 		 * Course Tutor Functions!
 		 */
 		
-			/**
-			 * Full calendar
-			 * @type {Boolean}
-			 */
-		 $('#fullcalendar').fullCalendar({
-	        // put your options and callbacks here
-	        editable: true,
-	        header: false,
-	        columnFormat: 'dddd',
-	        allDaySlot: false,
-	        height: "auto",
-	        minTime: "12:00:00",
-	        maxTime: "19:00:00",
-	        timezone: "America/Chicago",
-	        weekends: false,
-	        defaultView: 'agendaWeek',
-	        dayClick: function(date, jsEvent, view) {
-	        	FullCalendar.addNewEvent(date);
-		    },
-		    eventClick: function(calEvent, jsEvent, view) {
-		    	FullCalendar.deleteEvent(calEvent);
-		    }
-	    });
+		//Create a calendar
+		FullCalendar.newCalendar();
+
+		//Bindings to page!
+		$("#student-form").submit(function(event){
+			//Serialize data for POST object before submit event
+			var scheduledDates = $("#fullcalendar").fullCalendar('clientEvents');
+			if (!TutorScheduler.serializeCourses() || !TutorScheduler.serializeDates(scheduledDates)) {
+				event.preventDefault();
+			}
+
+			this.submit();
+		});
+
 		$("input.course-highlight-checkbox").on("click", function(event){
+			//For the check boxes of courses when adding a tutor
 			if ($(this).context.checked) {
 				$(this).parent().parent().addClass("success");
 			}else{

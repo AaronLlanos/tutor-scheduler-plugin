@@ -52,14 +52,12 @@
 				}
 			}
 
-			echo "execture post";
 			return $insertSuccess;
 		}
 
 		public function coursesToString($courses){
 			$coursesString = '';
 			foreach ($courses as $course) {
-				// var_dump($course);
 				$coursesString .= "<tr>";
 					$coursesString .= "<td>" . $course["name"] . "</td>";
 					$coursesString .= "<td>" . $course["date_added"] . "</td>";

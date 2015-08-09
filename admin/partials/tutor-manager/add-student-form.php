@@ -50,9 +50,11 @@
 			</div>
 		</div>
 		<div class="col-xs-6">
-			<label for="courses">Tutor Courses (<?php echo count($courses) ?>)</label>
+			<label>Tutor Courses (<?php echo count($courses) ?>)</label>
+			<input id="courses" type="text" name="courses" class="hidden">
+			<input id="schedule" type="text" name="schedule" class="hidden">
 			<div class="table-scroll">
-				<table id="courses" class="table table-bordered">
+				<table id="courses-table" class="table table-bordered">
 					<tbody><?php echo $this->coursesToString($courses); ?></tbody>
 				</table>
 			</div>
