@@ -29,17 +29,18 @@
 	
 	<!-- Tab List -->
 	<ul id="myTabs" class="nav nav-tabs" role="tablist">
-		<li role="presentation" class="active"><a aria-controls="add-tutor" role="tab" data-toggle="tab" href="#add-student">Add Tutor</a></li>
+		<li role="presentation" class="active"><a aria-controls="add-tutor" role="tab" data-toggle="tab" href="#add-tutor">Add Tutor</a></li>
 		<li role="presentation"><a aria-controls="manage-tutor-courses" role="tab" data-toggle="tab" href="#manage-tutor-courses">Manage Tutor Courses</a></li>
 		<li role="presentation"><a aria-controls="manage-tutor" role="tab" data-toggle="tab" href="#manage-tutor">Manage Tutor(s)</a></li>
 	</ul>
 	<!-- Tab Content -->
 	<div class="tab-content tas-admin-card">
+    	
 		<div role="tabpanel" id="add-tutor" class="tab-pane fade in active">
 			<?php require_once 'add-tutor-form.php'; ?>
 		</div>
 		<div role="tabpanel" id="manage-tutor-courses" class="tab-pane fade">
-			...
+			<?php require_once 'tutor-table.php'; ?>
 		</div>
 		<div role="tabpanel" id="manage-tutor" class="tab-pane fade">
 			...
