@@ -19,13 +19,13 @@
 <!-- Create a header in the default WordPress 'wrap' container -->
 <div class="wrap bootstrap-wpadmin">
     <!-- Add the icon to the page -->
-    <h2><span class="dashicons dashicons-calendar-alt"></span> &nbsp; <?php echo get_admin_page_title(); ?></h2>
-	<h4><?php echo "Number of Students: ". count($students); ?></h4>
-    
+    <h2><span class="dashicons dashicons-calendar-alt"></span> &nbsp; <?php echo get_admin_page_title(); ?></h2>    
     <hr>
 
     <!-- Main page content here. -->
     <?php echo $updateMessage; ?>
+	
+	<h4><?php echo "Number of Students: ". count($students); ?></h4>
 	
 	<!-- Tab List -->
 	<ul id="myTabs" class="nav nav-tabs" role="tablist">

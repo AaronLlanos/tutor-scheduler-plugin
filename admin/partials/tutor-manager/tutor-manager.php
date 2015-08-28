@@ -176,8 +176,7 @@
 				}
 
 			}
-			
-			// echo $dates;
+			return true;			
 		}
 
 		public function coursesToString($courses){
