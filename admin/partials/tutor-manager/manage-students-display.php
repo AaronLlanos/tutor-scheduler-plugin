@@ -20,25 +20,23 @@
 <div class="wrap bootstrap-wpadmin">
     <!-- Add the icon to the page -->
     <h2><span class="dashicons dashicons-calendar-alt"></span> &nbsp; <?php echo get_admin_page_title(); ?></h2>
+	<h4><?php echo "Number of Students: ". count($students); ?></h4>
+    
     <hr>
 
     <!-- Main page content here. -->
     <?php echo $updateMessage; ?>
-	<div class="row">
-		<div class="tas-admin-card">
-    		<?php require_once 'tutor-table.php'; ?>
-		</div>
-	</div>
+	
 	<!-- Tab List -->
 	<ul id="myTabs" class="nav nav-tabs" role="tablist">
-		<li role="presentation" class="active"><a aria-controls="home" role="tab" data-toggle="tab" href="#add-student">Add Tutor</a></li>
+		<li role="presentation" class="active"><a aria-controls="add-tutor" role="tab" data-toggle="tab" href="#add-student">Add Tutor</a></li>
 		<li role="presentation"><a aria-controls="manage-tutor-courses" role="tab" data-toggle="tab" href="#manage-tutor-courses">Manage Tutor Courses</a></li>
 		<li role="presentation"><a aria-controls="manage-tutor" role="tab" data-toggle="tab" href="#manage-tutor">Manage Tutor(s)</a></li>
 	</ul>
 	<!-- Tab Content -->
 	<div class="tab-content tas-admin-card">
-		<div role="tabpanel" id="add-student" class="tab-pane fade in active">
-			<?php require_once 'add-student-form.php'; ?>
+		<div role="tabpanel" id="add-tutor" class="tab-pane fade in active">
+			<?php require_once 'add-tutor-form.php'; ?>
 		</div>
 		<div role="tabpanel" id="manage-tutor-courses" class="tab-pane fade">
 			...

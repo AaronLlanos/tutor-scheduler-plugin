@@ -1,4 +1,3 @@
-<h4><?php echo "Number of Students: ". count($students); ?></h4>
 <table class="table table-striped table-hover">
 	<thead> 
 		<tr>
