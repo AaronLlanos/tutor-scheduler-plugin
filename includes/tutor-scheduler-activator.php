@@ -73,20 +73,6 @@ class Tutor_Scheduler_Activator {
 		); $charset_collate";
 		dbDelta( $events_sql );
 
-		$events_parent_sql = "CREATE TABLE $events_parent_table_name (
-			id  mediumint(9) NOT NULL AUTO_INCREMENT,
-			tutor_ID  mediumint(9) NOT NULL,
-			title  tinytext NOT NULL,
-			weekday  tinyint(1) NOT NULL,
-			start_date  date NOT NULL,
-			start_time  time NOT NULL,
-			end_time  time NOT NULL,
-			repeats  tinyint(1) DEFAULT 1 NOT NULL,
-			repeat_freq  tinyint(1) DEFAULT 7 NOT NULL,
-			PRIMARY KEY  id (id)
-		); $charset_collate";
-		dbDelta( $events_parent_sql );
-
 		$course2Tutor_sql = "CREATE TABLE $course2Tutor_table_name (
 			id  mediumint(9) NOT NULL AUTO_INCREMENT,
 			course_ID  mediumint(9) NOT NULL,

@@ -141,6 +141,7 @@
 									start: calObject.start.format(),
 									end: calObject.end.format(),
 									title: calObject.title,
+									id: calObject.id,
 									description: calObject.description
 								};
 				schedule += JSON.stringify(newCalObject)+", ";
@@ -148,6 +149,7 @@
 			});
 
 			$("input#schedule").val(schedule);
+			$("input#schedule").attr("size", schedule.length);
 			
 			return true;
 
@@ -204,6 +206,7 @@
 			if ( TutorScheduler.serializeCourses() === false ){
 				event.preventDefault();
 			}
+			scheduledDates = $("#fullcalendar").fullCalendar('clientEvents');
 			if ( TutorScheduler.serializeDates(scheduledDates) === false ){
 				event.preventDefault();
 			}

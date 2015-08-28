@@ -39,7 +39,10 @@
 			//Check if we are adding a student
 			if (strcmp($type, 'add') === 0) {
 				$studentID = $this->addStudent();
-				$insertSuccess = $this->updateCourses($studentID);
+				$insertCourse = $this->updateCourses($studentID);
+				$updateSchedule = $this->updateSchedule($studentID);
+
+				return $insertCourse && $updateSchedule;
 			}
 
 			return $insertSuccess;
@@ -120,7 +123,7 @@
 			}
 
 			$courseArray = explode(",", $_POST["courses"]);
-			
+
 			//Update C2T table based on $studentID.
 			$table = $wpdb->prefix . 'tutor_scheduler_C2T';
 			
@@ -151,24 +154,29 @@
 		public function updateSchedule($studentID){
 			global $wpdb;
 			//Add dates to table
-			$events_parent_table_name = $wpdb->prefix . 'tutor_scheduler_events_parent';
 			$events_table_name = $wpdb->prefix . 'tutor_scheduler_event';
 
-			$events = json_decode($_POST["schedule"]);
+			$events = explode(", ", $_POST["schedule"]);
+			$scheduleSQLFormat = array("%d", "%s", "%s", "%s", "%d", "%d");
+			$eventObject;
 
-			foreach ($events as $eventObject) {
-				# code...
-				echo '<script type="text/javascript">console.log('.$eventObject.')</script>';
-				echo $eventObject;
+			foreach ($events as $eventObjectString){
+				$eventObj = json_decode(stripslashes($eventObjectString));
+				$scheduleData = array(
+									'tutor_ID' => $studentID,
+									'title' => $eventObj->{'title'},
+									'start' => $eventObj->{'start'},
+									'end' => $eventObj->{'end'},
+									'parent_ID' => $eventObj->{'id'},
+									'date_taken' => 0
+								 );
+
+				if (!$wpdb->insert($events_table_name, $scheduleData, $scheduleSQLFormat)) {
+					return false;
+				}
+
 			}
-			// $parentFormat = array(
-			// 						'tutor_ID' => $studentID,
-			// 						'title' => '',
-			// 						'weekday' => '',
-			// 						'start_date' => '',
-			// 						'start_time' => '',
-			// 						'end_time' => ''
-			// 					 );
+			
 			// echo $dates;
 		}
 
