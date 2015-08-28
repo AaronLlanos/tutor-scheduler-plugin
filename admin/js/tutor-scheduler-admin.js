@@ -38,6 +38,36 @@
 	};
 
 	var FullCalendar = {
+		recurrDates: function(recurrUntil, scheduledDates){
+			var self = this;
+			var start;
+			recurrUntil = moment(recurrUntil, "YYYY-MM-DD");
+
+			$.each(scheduledDates, function(i, eventObject){
+				eventObject.id = i;
+				start = eventObject.start;
+				while (start.isBefore(recurrUntil)){
+					//Must subtract an hour because WP adds "1" to the timestamp rounding it up an hour
+					start = start.add({weeks: 1}).subtract({minutes: 60});
+					self.addNewEvent(start, i);
+				}
+
+			});
+
+		},
+		popup: function(){
+			var self = this;
+			$('#fullcalendar_popover').fullCalendar({
+				editable: true,
+		        timezone: "America/Chicago",
+				dayClick: function (date, jsEvent, view) {
+					//Input the value into input.
+					$("#recurr_until").val(date.format());
+					//Close the popover
+					$("#calendar_pop").popover('hide');
+				}
+			});
+		},
 		newCalendar: function () {
 			var self = this;
 			$('#fullcalendar').fullCalendar({
@@ -53,7 +83,7 @@
 		        weekends: false,
 		        defaultView: 'agendaWeek',
 		        dayClick: function(date, jsEvent, view) {
-		        	self.addNewEvent(date);
+		        	self.addNewEvent(date, 0);
 			    },
 			    eventClick: function(calEvent, jsEvent, view) {
 			    	self.deleteEvent(calEvent);
@@ -66,12 +96,13 @@
 				return event == calEvent;
 			});
 		},
-		addNewEvent: function(date){
+		addNewEvent: function(date, id){
 
 			var tutorName = $("#first-name").val() + " " + $("#last-name").val();
 			//Assume no name is less than 4 charactersl, including the space seperating first and last
 			if (tutorName.length > 4){
 				var eventObject = {
+					id: id,
 					title: tutorName,
 					start: date.format(),
 					end: date.add({hours: 1}),
@@ -152,7 +183,13 @@
 		/**
 		 * Course Tutor Functions!
 		 */
-		
+		$("#calendar_pop").popover({
+			content: '<div id="fullcalendar_popover"></div>',
+			html: true
+		});
+		$("#calendar_pop").click(function(){
+			FullCalendar.popup();
+		});
 		//Create a calendar
 		FullCalendar.newCalendar();
 
@@ -160,10 +197,16 @@
 		$("#student-form").submit(function(event){
 			//Serialize data for POST object before submit event
 			var scheduledDates = $("#fullcalendar").fullCalendar('clientEvents');
-			if (!TutorScheduler.serializeCourses() || !TutorScheduler.serializeDates(scheduledDates)) {
+			var recurrUntil = $("#recurr_until").val();
+
+			FullCalendar.recurrDates(recurrUntil, scheduledDates);
+
+			if ( TutorScheduler.serializeCourses() === false ){
 				event.preventDefault();
 			}
-
+			if ( TutorScheduler.serializeDates(scheduledDates) === false ){
+				event.preventDefault();
+			}
 			this.submit();
 		});
 

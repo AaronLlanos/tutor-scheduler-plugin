@@ -31,15 +31,17 @@ class Tutor_Scheduler_Activator {
 
 		$courses_table_name = $wpdb->prefix . 'tutor_scheduler_courses';
 		$tutors_table_name = $wpdb->prefix . 'tutor_scheduler_tutors';
-		$schedule_table_name = $wpdb->prefix . 'tutors_scheduler_schedules';
-		$date_table_name = 	$wpdb->prefix . 'tutors_scheduler_dates';
-		$course2Tutor_table_name = 	$wpdb->prefix . 'tutors_scheduler_C2T';
+		$schedule_table_name = $wpdb->prefix . 'tutor_scheduler_schedules';
+		$events_parent_table_name = $wpdb->prefix . 'tutor_scheduler_events_parent';
+		$events_table_name = $wpdb->prefix . 'tutor_scheduler_event';
+		$course2Tutor_table_name = 	$wpdb->prefix . 'tutor_scheduler_C2T';
 
 		$charset_collate = $wpdb->get_charset_collate();
 
 		$courses_sql = "CREATE TABLE $courses_table_name (
 			id  mediumint(9) NOT NULL AUTO_INCREMENT,
 			date_added  datetime NOT NULL,
+			tutor_count  mediumint(9) DEFAULT 0 NOT NULL,
 			name  tinytext DEFAULT '' NOT NULL,
 			PRIMARY KEY  id (id)
 		); $charset_collate";
@@ -59,20 +61,31 @@ class Tutor_Scheduler_Activator {
 		); $charset_collate";
 		dbDelta( $tutors_sql );
 
-		$schedule_sql = "CREATE TABLE $schedule_table_name (
+		$events_sql = "CREATE TABLE $events_table_name (
 			id  mediumint(9) NOT NULL AUTO_INCREMENT,
+			parent_ID  mediumint(9) NOT NULL,
 			tutor_ID  mediumint(9) NOT NULL,
+			start  datetime NOT NULL,
+			end  datetime NOT NULL,
+			title  tinytext NOT NULL,
+			date_taken  tinyint(1) DEFAULT 0 NOT NULL,
 			PRIMARY KEY  id (id)
 		); $charset_collate";
-		dbDelta( $schedule_sql );
+		dbDelta( $events_sql );
 
-		$date_sql = "CREATE TABLE $date_table_name (
+		$events_parent_sql = "CREATE TABLE $events_parent_table_name (
 			id  mediumint(9) NOT NULL AUTO_INCREMENT,
-			schedule_ID  mediumint(9) NOT NULL,
 			tutor_ID  mediumint(9) NOT NULL,
+			title  tinytext NOT NULL,
+			weekday  tinyint(1) NOT NULL,
+			start_date  date NOT NULL,
+			start_time  time NOT NULL,
+			end_time  time NOT NULL,
+			repeats  tinyint(1) DEFAULT 1 NOT NULL,
+			repeat_freq  tinyint(1) DEFAULT 7 NOT NULL,
 			PRIMARY KEY  id (id)
 		); $charset_collate";
-		dbDelta( $date_sql );
+		dbDelta( $events_parent_sql );
 
 		$course2Tutor_sql = "CREATE TABLE $course2Tutor_table_name (
 			id  mediumint(9) NOT NULL AUTO_INCREMENT,

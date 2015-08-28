@@ -37,7 +37,7 @@
 
 			foreach ($_POST as $key => $value) {
 				if ($value == "add"){
-					$data = array( 'date_added' => $date_added, 'name' => str_replace('_', ' ', $key), 'tutor_count' => 0);
+					$data = array( 'date_added' => $date_added, 'name' => str_replace('_', ' ', $key));
 
 					//Error check
 					if (!$wpdb->insert( $table, $data, $format )) {

@@ -62,8 +62,12 @@
 	</div>
 	<hr>
 	<div class="container">
+		<label for="recurr_until">Recurr Dates Until: (YYYY-MM-DD)</label>
+		<input id="recurr_until" name="recurr_until" type="text" required></input><a tabindex="0" class="btn btn-defalut" id="calendar_pop" role="button" ><span class="dashicons dashicons-calendar-alt"></span></a tabindex="0">
+		<br>
 		<div id='fullcalendar'></div>
 	</div>
 	<hr>
 	<input type="submit" class="btn btn-success" value="Add Student">
 </form>
+

@@ -17,6 +17,7 @@
 			}
 			
 			//Run POST data
+			$updateMessage = '';
 			if (count($_POST) > 0){
  				$insertSuccess = $this->executePostRequest();
 				$updateMessage = $this->getUpdateMessage($updateMessage, $insertSuccess);
@@ -37,19 +38,36 @@
 
 			//Check if we are adding a student
 			if (strcmp($type, 'add') === 0) {
-				$insertSuccess = $this->add_student();
+				$studentID = $this->addStudent();
+				$insertSuccess = $this->updateCourses($studentID);
 			}
 
 			return $insertSuccess;
 		}
 
-		public function add_student(){
+		public function getCourseCount( $courses ){
+
+			$courseArray = explode(",", $courses);
+			$courseArrayCount = count($courseArray);
+			if ($courseArrayCount == 1) {
+				if (strcmp($courseArray[0], "") == 0)
+					return 0;
+			}
+
+			return $courseArrayCount;
+		}
+
+		/**
+		 * @function addStudent() adds a student to the database.
+		 * @return int|false Returns unique student ID if successful. Otherwise false.
+		 */
+		public function addStudent(){
 			global $wpdb;
 
 			//Default information for table query
 			$insertSuccess = true;
 			$table = $this->tutor_table_name;
-			$format = array('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s');
+			$format = array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s');
 			$date_added = date('Y-m-d H:i:s');
 
 			//Get all variables from form
@@ -59,13 +77,7 @@
 			$major = $_POST["major"];
 			$classification = $_POST["classification"];
 			$program = $_POST["program"];
-			$coursesCount = count(explode(",", $courseArray));
-
-			//Add courses to DB.C2T
-
-			//Add new tutor schedule to DB
-			// $scheduleData = array('tutor_name' => , );
-			$scheduleID = $wpdb->insert_id; //Unique ID of newly inserted schedule
+			$coursesCount = $this->getCourseCount($_POST["courses"]);
 
 			//Send all the data to the student table
 			$tutorData = array( 'first_name' => $firstName,
@@ -74,17 +86,90 @@
 						 	'major' => $major,
 						 	'classification' => $classification,
 						 	'program' => $program,
-						 	'coursesCount' => $coursesCount,
-						 	'date_added' => $date_added,
-						 	'schedule' => $scheduleID
+						 	'course_count' => $coursesCount,
+						 	'date_added' => $date_added
 						);
-			//Error check
-			// $wpdb->show_errors(); //Debug!!
-			if (!$wpdb->insert( $table, $data, $format )) {
-				// $wpdb->print_error(); //Debug!
-		 		$insertSuccess = false;
+
+			//Insert into table. Get the ID to update the C2T table
+			if (!$wpdb->insert( $table, $tutorData, $format )) {
+		 		return false;
 			}
-			return $insertSuccess;
+			else {
+				//Error check
+				// Unique ID of newly inserted schedule.
+				// Returns false if the last insertion was not completed properly 	
+				return $wpdb->insert_id;
+			}
+				
+		}
+
+		/**
+		 * Update courses for tutor for join table
+		 * @param  int|false $studentID False if student not inserted (see addStudent()). Int
+		 * @return bool            return true or false on success or failure respectively.
+		 */
+		public function updateCourses($studentID){
+			global $wpdb;
+
+			if (!$studentID) {
+				return false;
+			}
+
+			if ($this->getCourseCount($_POST["courses"]) == 0) {
+				return true;
+			}
+
+			$courseArray = explode(",", $_POST["courses"]);
+			
+			//Update C2T table based on $studentID.
+			$table = $wpdb->prefix . 'tutor_scheduler_C2T';
+			
+			$format = array('%d', '%d');
+			foreach ($courseArray as $courseID) {
+				$courseData = array('course_id' => $courseID, 'tutor_id' => $studentID);
+				if (!$wpdb->insert( $table, $courseData, $format )) {
+			 		return false;
+				}
+				//Update course tutor count
+				$tutorCountQuery = 'SELECT tutor_count FROM '. $this->courses_table_name . ' WHERE id = ' . $courseID;
+				$tutorCount = $wpdb->get_var($tutorCountQuery);
+				$tutorCount += 1;
+				$wpdb->update(
+								$this->courses_table_name, 
+								array('tutor_count' => $tutorCount),
+								array('id' => $courseID)
+							 );
+			}
+			return true;
+		}
+
+		/**
+		 * Update schedule for tutor
+		 * @param  int|false $studentID False if student not inserted (see addStudent()). Int
+		 * @return bool            return true or false on success or failure respectively.
+		 */
+		public function updateSchedule($studentID){
+			global $wpdb;
+			//Add dates to table
+			$events_parent_table_name = $wpdb->prefix . 'tutor_scheduler_events_parent';
+			$events_table_name = $wpdb->prefix . 'tutor_scheduler_event';
+
+			$events = json_decode($_POST["schedule"]);
+
+			foreach ($events as $eventObject) {
+				# code...
+				echo '<script type="text/javascript">console.log('.$eventObject.')</script>';
+				echo $eventObject;
+			}
+			// $parentFormat = array(
+			// 						'tutor_ID' => $studentID,
+			// 						'title' => '',
+			// 						'weekday' => '',
+			// 						'start_date' => '',
+			// 						'start_time' => '',
+			// 						'end_time' => ''
+			// 					 );
+			// echo $dates;
 		}
 
 		public function coursesToString($courses){
@@ -125,8 +210,10 @@
 					$studentsString .= "<td>" . $student["last_name"] . "</td>";
 					$studentsString .= "<td>" . $student["email"] . "</td>";
 					$studentsString .= "<td>" . $student["major"] . "</td>";
-					$studentsString .= "<td>" . $student["coursesCount"] . "</td>";
-					$studentsString .= '<td><button class="btn btn-xs btn-danger student-remove" data-name="' . $student["name"] . '" data-studentID="' . $student["id"] . '">X</button></td>';
+					$studentsString .= "<td>" . $student["classification"] . "</td>";
+					$studentsString .= "<td>" . $student["course_count"] . "</td>";
+					$studentsString .= "<td>" . $student["date_added"] . "</td>";
+					$studentsString .= '<td><button class="btn btn-xs btn-danger student-remove" data-name="' . $student["first_name"] . ' ' . $student["last_name"] . '" data-studentID="' . $student["id"] . '">X</button></td>';
 				$studentsString .= "</tr>";
 			}
 

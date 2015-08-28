@@ -123,6 +123,7 @@ class Tutor_Scheduler_Admin {
 		//FullCalendar
 		wp_enqueue_script( 'fullcalendar', plugin_dir_url( __FILE__ ) . 'js/full-calendar.min.js', array( 'jquery', 'moment' ), $this->version, false );
 		
+		// wp_localize_script( 'FullCalendarFuncs',  );
 	}
 
 
@@ -240,23 +241,23 @@ class Tutor_Scheduler_Admin {
 	}
 
 	/**
-		 * [get_tutor_courses description]
-		 * @return 	array|boolean return array of tutor courses on success. Else, return false.
-		 */
-		public function get_tutor_courses(){
-			global $wpdb;
+	 * [get_tutor_courses description]
+	 * @return 	array|boolean return array of tutor courses on success. Else, return false.
+	 */
+	public function get_tutor_courses(){
+		global $wpdb;
 
-	 		// echo '<script type="text/javascript">console.log("Courses table name =  ' . $this->courses_table_name . '");</script>';
-			
-			$query = "
-				SELECT *
-				FROM " . $this->courses_table_name . "
-				ORDER BY name
-			";
+ 		// echo '<script type="text/javascript">console.log("Courses table name =  ' . $this->courses_table_name . '");</script>';
+		
+		$query = "
+			SELECT *
+			FROM " . $this->courses_table_name . "
+			ORDER BY name
+		";
 
-			$courses = $wpdb->get_results($query);
+		$courses = $wpdb->get_results($query);
 
-			return json_encode($courses);
-		}
+		return json_encode($courses);
+	}
 
 }
