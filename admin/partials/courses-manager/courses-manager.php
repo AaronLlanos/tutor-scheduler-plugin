@@ -16,6 +16,7 @@
 			if ( !current_user_can( 'manage_options' ) )  {
 				wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 			}
+			$updateMessage = '';
 			if (count($_POST) > 0){
 				$insertSuccess = $this->executePostRequest();
 				$updateMessage = $this->getUpdateMessage($updateMessage, $insertSuccess);

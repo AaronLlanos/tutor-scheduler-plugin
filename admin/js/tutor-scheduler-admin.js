@@ -78,7 +78,7 @@
 		        allDaySlot: false,
 		        height: "auto",
 		        minTime: "12:00:00",
-		        maxTime: "19:00:00",
+		        maxTime: "20:00:00",
 		        timezone: "America/Chicago",
 		        weekends: false,
 		        defaultView: 'agendaWeek',
