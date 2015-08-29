@@ -45,7 +45,7 @@
 
 			$.each(scheduledDates, function(i, eventObject){
 				eventObject.id = i;
-				start = eventObject.start;
+				start = eventObject.start.add({minutes: 60});
 				while (start.isBefore(recurrUntil)){
 					//Must subtract an hour because WP adds "1" to the timestamp rounding it up an hour
 					start = start.add({weeks: 1}).subtract({minutes: 60});
