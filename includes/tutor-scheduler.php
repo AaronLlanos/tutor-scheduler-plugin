@@ -62,6 +62,8 @@ class Tutor_Scheduler {
 		$this->courses_slug = 'tutor-scheduler-courses';
 		$this->courses_table_name = 'tutor_scheduler_courses';
 		$this->tutors_table_name = 'tutor_scheduler_tutors';
+		$this->C2T_table_name = 'tutor_scheduler_C2T';
+		$this->events_table_name = 'tutor_scheduler_event';
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
@@ -168,11 +170,20 @@ class Tutor_Scheduler {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new Tutor_Scheduler_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new Tutor_Scheduler_Public( 
+							$this->get_plugin_name(), 
+							$this->get_version(),
+							$this->get_courses_table_name(),
+							$this->get_tutors_table_name(), 
+							$this->get_C2T_table_name(),
+							$this->get_events_table_name()
+						);
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
+		//Add shortcode to run the front end.
+		add_shortcode( 'lcae_tutor_appointment_scheduler', array($plugin_public, 'run') );
 	}
 
 	/**
@@ -257,6 +268,16 @@ class Tutor_Scheduler {
 	public function get_tutors_table_name(){
 		global $wpdb;
 		return $wpdb->prefix . $this->tutors_table_name;
+	}
+
+	public function get_C2T_table_name(){
+		global $wpdb;
+		return $wpdb->prefix . $this->C2T_table_name;
+	}
+
+	public function get_events_table_name(){
+		global $wpdb;
+		return $wpdb->prefix . $this->events_table_name;
 	}
 
 }

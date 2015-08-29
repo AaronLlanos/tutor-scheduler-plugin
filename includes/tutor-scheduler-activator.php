@@ -31,8 +31,6 @@ class Tutor_Scheduler_Activator {
 
 		$courses_table_name = $wpdb->prefix . 'tutor_scheduler_courses';
 		$tutors_table_name = $wpdb->prefix . 'tutor_scheduler_tutors';
-		$schedule_table_name = $wpdb->prefix . 'tutor_scheduler_schedules';
-		$events_parent_table_name = $wpdb->prefix . 'tutor_scheduler_events_parent';
 		$events_table_name = $wpdb->prefix . 'tutor_scheduler_event';
 		$course2Tutor_table_name = 	$wpdb->prefix . 'tutor_scheduler_C2T';
 

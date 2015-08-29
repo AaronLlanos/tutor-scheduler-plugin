@@ -41,8 +41,21 @@ class Tutor_Scheduler_Loader {
 
 		$this->actions = array();
 		$this->filters = array();
+		// $this->shortcodes = array();
 
 	}
+
+	/**
+	 * Adds a new shortcode to the 
+	 *
+	 * @since 	1.0.0
+	 * @param 	string 		required 	$tag 			Shortcode tag to be searched in post content
+	 * @param 	callable 	required 	$callback 			Hook to run when shortcode is found
+	 * @return  void 									No return
+	 */
+	// public function add_shortcode( $hook, $component, $tag, $callback ) {
+	// 	$this->shortcodes = $this->add( $this->shortcodes, $hook, $component, $tag, $callback ); 
+	// }
 
 	/**
 	 * Add a new action to the collection to be registered with WordPress.
@@ -114,6 +127,7 @@ class Tutor_Scheduler_Loader {
 		foreach ( $this->actions as $hook ) {
 			add_action( $hook['hook'], array( $hook['component'], $hook['callback'] ), $hook['priority'], $hook['accepted_args'] );
 		}
+
 
 	}
 
