@@ -90,7 +90,6 @@ class Tutor_Scheduler_Public {
 		wp_enqueue_style( 'bootstrap', plugin_dir_url( __FILE__ ) . 'css/libs/bootstrap.min.css', array(), $this->version, 'all' );
 		//FullCalendar
 		wp_enqueue_style( 'fullcalendar', plugin_dir_url( __FILE__ ) . 'css/libs/full-calendar.min.css', array(), $this->version, 'all' );
-		
 	}
 
 	/**
@@ -117,9 +116,11 @@ class Tutor_Scheduler_Public {
 		//Moment.js
 		wp_enqueue_script( 'moment', plugin_dir_url( __FILE__ ) . 'js/libs/moment.min.js', array(), '2.10.3', false );
 		//Bootstrap
-		wp_enqueue_script( 'bootstrap', plugin_dir_url( __FILE__ ) . 'js/libs/bootstrap.min.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( 'bootstrap', plugin_dir_url( __FILE__ ) . 'js/libs/bootstrap.min.js', array( 'jquery' ), '3.3.5', false );
 		//FullCalendar
-		wp_enqueue_script( 'fullcalendar', plugin_dir_url( __FILE__ ) . 'js/libs/full-calendar.min.js', array( 'jquery', 'moment' ), $this->version, false );
+		wp_enqueue_script( 'fullcalendar', plugin_dir_url( __FILE__ ) . 'js/libs/full-calendar.min.js', array( 'jquery', 'moment' ), '2.3.2', false );
+		//underscore for filtering
+		wp_enqueue_script( 'underscore', plugin_dir_url( __FILE__ ) . 'js/libs/underscore.min.js', array(), '1.8.3', false );
 		
 	}
 
@@ -133,7 +134,7 @@ class Tutor_Scheduler_Public {
  		// echo '<script type="text/javascript">console.log("Courses table name =  ' . $this->courses_table_name . '");</script>';
 		
 		$query = "
-			SELECT *
+			SELECT id, name
 			FROM " . $this->courses_table_name . "
 			ORDER BY id
 		";
