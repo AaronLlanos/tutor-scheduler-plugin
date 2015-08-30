@@ -18,11 +18,11 @@
 <div class="row">
 	<div class="col-sm-6">
 		<label for="course-select">Select a Course</label>
-		<input id="course-select" type="text" placeholder="Ex: CHEM 301" class="form-control">
+		<select name="course-select" id="course-select" class="form-control"></select>
 	</div>
 	<div class="col-sm-6">
-		<label for="tutors-list">Select a Tutor</label>
-		<select name="tutors-list" id="tutors-list" class="form-control"></select>
+		<label for="tutor-select">Select a Tutor</label>
+		<select name="tutor-select" id="tutor-select" class="form-control"></select>
 	</div>
 </div>
 <hr>
