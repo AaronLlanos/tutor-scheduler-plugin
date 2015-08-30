@@ -35,12 +35,22 @@
 			    },
 		        //Tooltip to confirm appointment here.
 			    eventClick: function(calEvent, jsEvent, view) {
-		        	// console.log("Click!");
-		        	self.confirmAppointment();
+		        	// console.log(calEvent);
+		        	self.confirmAppointment(calEvent);
 			    }
 		    });
 		},
-		confirmAppointment: function () {
+		confirmAppointment: function (calEvent) {
+			$(".selected-tutor-name").html(calEvent.title);
+			$("#selected-tutor-date").html(calEvent.start.format("dddd, MMMM Do YYYY, h:mma"));
+			var selectedCourse = _.find(coursesJSON, function(courseObject){
+				return courseObject.id === $("#course-select").val();
+			});
+			if (selectedCourse == undefined) {
+				$("#selected-tutor-subject").html('Not Selected');
+			}else{
+				$("#selected-tutor-subject").html(selectedCourse.name);
+			}
 			$("#confirm-appointment-modal").modal('show');
 		},
 		updateEvents: function (tutorIDs) {
@@ -69,6 +79,7 @@
 		loadBindings: function () {
 			var self = this;
 			$("#course-select").on('change', function(){
+				console.log();
 				var selectedCourseID = $(this).val();
 				var filteredTutorJSON;
 				if (selectedCourseID === "") {
