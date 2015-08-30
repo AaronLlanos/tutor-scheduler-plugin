@@ -29,3 +29,11 @@
 <div class="row">
 	<div id="fullcalendar-frontend"></div>
 </div>
+
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirm-appointment-modal" id="confirm-appointment-modal">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<?php require_once 'partials/confirm-appointment-modal.php'; ?>
+		</div>
+	</div>
+</div>

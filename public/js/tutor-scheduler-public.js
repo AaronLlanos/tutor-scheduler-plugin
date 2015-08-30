@@ -35,13 +35,13 @@
 			    },
 		        //Tooltip to confirm appointment here.
 			    eventClick: function(calEvent, jsEvent, view) {
-		        	// Must add a tooltip here
+		        	// console.log("Click!");
 		        	self.confirmAppointment();
 			    }
 		    });
 		},
 		confirmAppointment: function () {
-			
+			$("#confirm-appointment-modal").modal('show');
 		},
 		updateEvents: function (tutorIDs) {
 			var self = this;
