@@ -181,6 +181,8 @@ class Tutor_Scheduler {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action( 'wp_ajax_nopriv_confirm_tas_appointment', $plugin_public, 'confirm_tas_appointment' );
+		$this->loader->add_action( 'wp_ajax_confirm_tas_appointment', $plugin_public, 'confirm_tas_appointment' );
 
 		//Add shortcode to run the front end.
 		add_shortcode( 'lcae_tutor_appointment_scheduler', array($plugin_public, 'run') );
