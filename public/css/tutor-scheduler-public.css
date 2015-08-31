@@ -3,43 +3,9 @@
  * included in this file.
  */
 
-h2 > span.dashicons.dashicons-calendar-alt{
-	height: 40px;
-	width: 40px;
-	font-size: 40px;
-}
-
-.tas-admin-card{
-	background-color: #FFF;
-	box-shadow: 1px 1px 3px #274160;
-	margin-bottom: 15px;
-	padding: 10px;
-}
-
-.tas-admin-card-full{
-	height: 100%;
-}
-
-.table-scroll {
-  height: 230px;
-  overflow-y: auto;
-}
-/**
- * Full calendar
- */
-.calendar-highlight{
-	border-color: rgb(250, 0, 0) !important;
-}
-
-/**
- * Overide!
- */
-#wpwrap {
-  background-color: rgb(240, 240, 240) !important;
-}
-
-#wpfooter{
-	position: inherit !important
+.loading-spinner{
+	width: 16px;
+	height: 16px;
 }
 
 

@@ -1,0 +1,26 @@
+/* AddThisEvent theme CSS
+---------------------------------------------------------------------- */
+
+/* General */
+.addthisevent 							{visibility:hidden;}
+.addthisevent span 						{display:none!important;}
+.addthisevent .data 					{display:none!important;}
+
+/* The button */
+.addthisevent-drop 						{display:inline-block;position:relative;z-index:999998;font-family:Roboto,"Helvetica Neue",Helvetica,Optima,Segoe,"Segoe UI",Candara,Calibri,Arial,sans-serif;color:#fff!important;font-weight:300;text-decoration:none;font-size:15px;}
+.addthisevent-drop:hover 				{color:#fff;font-size:15px;text-decoration:none;}
+
+/* The drop down */
+.addthisevent_dropdown 					{position:relative;text-align:left;display:block!important;}
+.addthisevent_dropdown span 			{display:inline-block;position:relative;line-height:110%;background:#ebebeb url(../gfx/button-bg-t1.png) repeat-x!important;text-decoration:none;font-size:14px;font-weight:300;color:#333;cursor:pointer;padding:7px 14px 8px 12px;border:1px solid #e1e1e1;margin:0px 6px 0px 0px;-moz-border-radius:4px;-webkit-border-radius:4px;}
+.addthisevent_dropdown span:hover 		{background:#f4f4f4;color:#000;text-decoration:none;font-size:14px;}
+.addthisevent_dropdown span:active 		{top:1px;}
+.addthisevent_dropdown .ateoutlook 		{border-top:3px solid #fa9d00;}
+.addthisevent_dropdown .ategoogle 		{border-top:3px solid #d53900;}
+.addthisevent_dropdown .ateoutlookcom 	{border-top:3px solid #1473c5;}
+.addthisevent_dropdown .ateyahoo 		{border-top:3px solid #65106e;}
+.addthisevent_dropdown .ateappleical 	{border-top:3px solid #ab373a;}
+.addthisevent_dropdown .copyx 			{display:none;}
+.addthisevent_dropdown .brx 			{display:none;}
+.addthisevent_dropdown .frs 			{position:absolute;top:8px;cursor:pointer;right:13px;padding-left:10px;font-style:normal;font-weight:normal;text-align:right;z-index:101;line-height:110%;background:#fff;text-decoration:none;font-size:10px;color:#cacaca;}
+.addthisevent_dropdown .frs:hover 		{color:#6d84b4;}
