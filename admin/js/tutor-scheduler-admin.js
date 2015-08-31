@@ -6,6 +6,38 @@
 	 */
 	var CourseManager = {
 		tempCourses: [],
+		loadBindings: function () {
+			$("#add-course-button").on("click", function(){
+				CourseManager.addCourse();
+			});
+			$("#add-course-input").keypress(function(event){
+				if ( event.which === 13 ) {
+					event.preventDefault();
+					$("#add-course-button").click();
+				}
+				
+			});
+			$(".course-remove").on("click", function(){
+				var confirmedVal = confirm("Are you sure you want to remove " + $(this).attr("data-name") + " from the table?");
+				if (confirmedVal === true) {
+					//Remove the course from the table
+					$(this).parent().parent().addClass("danger");
+					$("#temp-course-table").prepend(CourseManager.addCourseFormat($(this).attr("data-courseID"), false));
+					$("#temp-course-table").prepend('<tr class="danger"><td>'+$(this).attr("data-name")+'</td></tr>');
+				}
+			});
+
+			/**
+			 * Course Tutor Functions!
+			 */
+			$("#calendar_pop").popover({
+				content: '<div id="fullcalendar_popover"></div>',
+				html: true
+			});
+			$("#calendar_pop").click(function(){
+				FullCalendar.popup();
+			});
+		},
 		validateCourse: function(inputValue){
 			//Make sure it is not blank
 			if (inputValue.length === 0) {
@@ -153,6 +185,35 @@
 			
 			return true;
 
+		},
+		loadBindings: function () {
+
+			//Create a calendar
+			$("#student-form").submit(function(event){
+				//Serialize data for POST object before submit event
+				var scheduledDates = $("#fullcalendar").fullCalendar('clientEvents');
+				var recurrUntil = $("#recurr_until").val();
+
+				FullCalendar.recurrDates(recurrUntil, scheduledDates);
+
+				if ( TutorScheduler.serializeCourses() === false ){
+					event.preventDefault();
+				}
+				scheduledDates = $("#fullcalendar").fullCalendar('clientEvents');
+				if ( TutorScheduler.serializeDates(scheduledDates) === false ){
+					event.preventDefault();
+				}
+				this.submit();
+			});
+
+			$("input.course-highlight-checkbox").on("click", function(event){
+				//For the check boxes of courses when adding a tutor
+				if ($(this).context.checked) {
+					$(this).parent().parent().addClass("success");
+				}else{
+					$(this).parent().parent().removeClass("success");
+				}
+			});
 		}
 	}
 
@@ -162,65 +223,13 @@
 		/**
 		 * Course Manager Functions!!!!!!
 		 */
-		$("#add-course-button").on("click", function(){
-			CourseManager.addCourse();
-		});
-		$("#add-course-input").keypress(function(event){
-			if ( event.which === 13 ) {
-				event.preventDefault();
-				$("#add-course-button").click();
-			}
-			
-		});
-		$(".course-remove").on("click", function(){
-			var confirmedVal = confirm("Are you sure you want to remove " + $(this).attr("data-name") + " from the table?");
-			if (confirmedVal === true) {
-				//Remove the course from the table
-				$(this).parent().parent().addClass("danger");
-				$("#temp-course-table").prepend(CourseManager.addCourseFormat($(this).attr("data-courseID"), false));
-				$("#temp-course-table").prepend('<tr class="danger"><td>'+$(this).attr("data-name")+'</td></tr>');
-			}
-		});
+		CourseManager.loadBindings();
 
 		/**
-		 * Course Tutor Functions!
+		 * Tutor Manager Functions!
 		 */
-		$("#calendar_pop").popover({
-			content: '<div id="fullcalendar_popover"></div>',
-			html: true
-		});
-		$("#calendar_pop").click(function(){
-			FullCalendar.popup();
-		});
-		//Create a calendar
 		FullCalendar.newCalendar();
-
-		//Bindings to page!
-		$("#student-form").submit(function(event){
-			//Serialize data for POST object before submit event
-			var scheduledDates = $("#fullcalendar").fullCalendar('clientEvents');
-			var recurrUntil = $("#recurr_until").val();
-
-			FullCalendar.recurrDates(recurrUntil, scheduledDates);
-
-			if ( TutorScheduler.serializeCourses() === false ){
-				event.preventDefault();
-			}
-			scheduledDates = $("#fullcalendar").fullCalendar('clientEvents');
-			if ( TutorScheduler.serializeDates(scheduledDates) === false ){
-				event.preventDefault();
-			}
-			this.submit();
-		});
-
-		$("input.course-highlight-checkbox").on("click", function(event){
-			//For the check boxes of courses when adding a tutor
-			if ($(this).context.checked) {
-				$(this).parent().parent().addClass("success");
-			}else{
-				$(this).parent().parent().removeClass("success");
-			}
-		});
+		TutorScheduler.loadBindings();
 
 	});
 
