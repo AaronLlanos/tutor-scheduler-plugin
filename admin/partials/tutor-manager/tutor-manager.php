@@ -11,6 +11,7 @@
 			$this->courses_table_name = $courses_table_name;
 		}
 		public function run(){
+			global $wpdb;
 			//Check for admin priveldges
 			if ( !current_user_can( 'read' ) )  {
 				wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
@@ -21,6 +22,12 @@
 			if (count($_POST) > 0){
  				$insertSuccess = $this->executePostRequest();
 				$updateMessage = $this->getUpdateMessage($updateMessage, $insertSuccess);
+			}
+			$type = isset($_GET['type']) ? $_GET['type'] : '';
+			if (strcmp($type, 'remove') === 0) {
+				$insertSuccess = $wpdb->delete( $this->tutor_table_name, array('id' => $_GET['id']) );
+				$updateMessage = $this->getUpdateMessage($updateMessage, $insertSuccess);
+				
 			}
 
 			//Grab the students
@@ -220,7 +227,7 @@
 					$studentsString .= "<td>" . $student["classification"] . "</td>";
 					$studentsString .= "<td>" . $student["course_count"] . "</td>";
 					$studentsString .= "<td>" . $student["date_added"] . "</td>";
-					$studentsString .= '<td><button class="btn btn-xs btn-danger student-remove" data-name="' . $student["first_name"] . ' ' . $student["last_name"] . '" data-studentID="' . $student["id"] . '">X</button></td>';
+					$studentsString .= '<td><a href="'.admin_url('admin.php?page=' . $this->tutor_slug . '&type=remove&id='.$student["id"]).'" class="btn btn-xs btn-danger student-remove" data-name="' . $student["first_name"] . ' ' . $student["last_name"] . '">X</a></td>';
 				$studentsString .= "</tr>";
 			}
 

@@ -214,6 +214,14 @@
 					$(this).parent().parent().removeClass("success");
 				}
 			});
+
+			$(".student-remove").on("click", function(event){
+				var confirmedVal = confirm("Are you sure you want to remove " + $(this).attr("data-name") + " from the table?");
+				if (confirmedVal === false) {
+					//Stop propigation
+					event.preventDefault();
+				}
+			});
 		}
 	}
 

@@ -115,14 +115,13 @@ class Tutor_Scheduler_Admin {
 		 */
 
 		//Moment.js
-		wp_enqueue_script( 'moment', plugin_dir_url( __FILE__ ) . 'js/moment.min.js', array(), '2.10.3', false );
-
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/tutor-scheduler-admin.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( 'moment', plugin_dir_url( __FILE__ ) . 'js/libs/moment.min.js', array(), '2.10.3', false );
 		//Bootstrap
-		wp_enqueue_script( 'bootstrap', plugin_dir_url( __FILE__ ) . 'js/bootstrap.min.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( 'bootstrap', plugin_dir_url( __FILE__ ) . 'js/libs/bootstrap.min.js', array( 'jquery' ), $this->version, false );
 		//FullCalendar
-		wp_enqueue_script( 'fullcalendar', plugin_dir_url( __FILE__ ) . 'js/full-calendar.min.js', array( 'jquery', 'moment' ), $this->version, false );
+		wp_enqueue_script( 'fullcalendar', plugin_dir_url( __FILE__ ) . 'js/libs/full-calendar.min.js', array( 'jquery', 'moment' ), $this->version, false );
 		
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/tutor-scheduler-admin.js', array( 'jquery', 'moment', 'bootstrap', 'fullcalendar' ), $this->version, false );
 		// wp_localize_script( 'FullCalendarFuncs',  );
 	}
 
