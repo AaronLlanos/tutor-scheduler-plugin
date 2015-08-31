@@ -1,4 +1,18 @@
-<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<?php 
+
+/**
+* 
+*/
+class Email_Controller
+{
+	
+	function __construct() {
+		# code...
+	}
+
+	public static function getMessage($eventDate, $tutorSubject, $tutorName, $tutorEmail, $tuteeName, $tuteeEmail, $noteToTutor) {
+		return '
+		<html xmlns="http://www.w3.org/1999/xhtml"><head>
 		    	<!-- NAME: 1 COLUMN -->
 		        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		        <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -597,12 +611,14 @@
 		Booked Your Appointment!</h1>
 
 		<ul>
-			<li><strong>Where: </strong>where</li>
-			<li><strong>When:&nbsp;</strong>when</li>
-			<li><strong>Tutor Name: </strong>with</li>
-			<li><strong>Tutor Email: </strong>tutor</li>
-			<li><strong>Tutee Name</strong>: tutee</li>
-			<li><strong>Tutee Email:</strong> tutee</li>
+			<li><strong>Where: </strong>SSB 4.400</li>
+			<li><strong>When: </strong>'.$eventDate.'</li>
+			<li><strong>Subject: </strong>'.$tutorSubject.'</li>
+			<li><strong>Tutor Name: </strong>'.$tutorName.'</li>
+			<li><strong>Tutor Email: </strong>'.$tutorEmail.'</li>
+			<li><strong>Tutee Name</strong>: '.$tuteeName.'</li>
+			<li><strong>Tutee Email:</strong> '.$tuteeEmail.'</li>
+			<li><strong>Note to Tutor:</strong> <p>'.$noteToTutor.'</p></li>
 		</ul>
 
 		                        </td>
@@ -659,4 +675,6 @@
 		        </center>
 		    
 
-		</body></html>
+		</body></html>';
+	}
+}

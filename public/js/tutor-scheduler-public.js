@@ -101,13 +101,14 @@
 			$(".modal-success").addClass("bg-success");
 			$(".before-ajax-request").addClass("hidden");
 			$(".after-ajax-success").removeClass("hidden");
+
 		},
 		ajaxError: function (argument) {
 			$(".modal-success").addClass("bg-danger");
 		},
 		loadBindings: function () {
 			var self = this;
-			
+
 			$("#course-select").on('change', function(){
 				var selectedCourseID = $(this).val();
 				var filteredTutorJSON;
@@ -149,12 +150,12 @@
 						note_to_tutor: $("#note-to-tutor").val(),
 						program: $("#program").val()
 					},
-					success: function(response) {
-						if(response.type == "success") {
-							self.ajaxSuccess();
+					success: function(resp) {
+						if(resp.type == "success") {
+							self.ajaxSuccess(resp.event_id);
 						}
 						else {
-							self.ajaxError(response.message);
+							self.ajaxError(resp.message);
 						}
 					},
 					error: function ( jqXHR, textStatus, errorThrown) {
