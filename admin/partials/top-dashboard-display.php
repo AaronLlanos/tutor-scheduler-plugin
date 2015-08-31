@@ -34,13 +34,13 @@
     	<div class="col-sm-6 col-xs-6">
     		<div class="tas-admin-card">
     			<p>In order to manage students and their schedules, click the button below.</p><br>
-    			<a class="text-center btn btn-primary" href="<?php menu_page_url( Tutor_Scheduler::get_student_slug_name(), true ); ?>">Manage Students</a>
+    			<a class="text-center btn btn-primary" href="<?php menu_page_url( $this->student_slug, true ); ?>">Manage Students</a>
 			</div>
     	</div>
     	<div class="col-sm-6 col-xs-6">
     		<div class="tas-admin-card">
-				<p>In order to manage tutor's courses, click the button below. <b>Note: </b>This option allows adding new courses and assigning them to students.</p>
-    			<a class="text-center btn btn-primary" href="<?php menu_page_url( Tutor_Scheduler::get_courses_slug_name(), true ); ?>">Manage Courses</a>
+				<p>In order to manage tutor's courses, click the button below.  &nbsp;<b>Note: </b>This option allows adding new courses and assigning them to students.</p>
+    			<a class="text-center btn btn-primary" href="<?php menu_page_url( $this->courses_slug, true ); ?>">Manage Courses</a>
     		</div>
     	</div>
     </div>
