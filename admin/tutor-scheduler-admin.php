@@ -173,7 +173,7 @@ class Tutor_Scheduler_Admin {
 		add_menu_page( 
 			'Tutor Appointment Scheduler',
 			'LCAE Tutor Scheduler',
-			'manage_options',
+			'read',
 			$this->top_level_slug,
 			array( $this, 'load_top_level_display' ),
 			'dashicons-calendar-alt',
@@ -193,7 +193,7 @@ class Tutor_Scheduler_Admin {
 			$this->top_level_slug,
 			'Manage Courses',
 			'Manage Courses',
-			'manage_options',
+			'read',
 			$this->courses_slug,
 			array( $this, 'load_manage_courses_page' ) 
 		);
@@ -211,7 +211,7 @@ class Tutor_Scheduler_Admin {
 			$this->top_level_slug,
 			'Manage Students',
 			'Manage Students',
-			'manage_options',
+			'read',
 			$this->student_slug,		
 			array( $this, 'load_manage_students_page' )
  		);
