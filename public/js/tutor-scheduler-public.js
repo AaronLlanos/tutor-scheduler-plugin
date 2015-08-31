@@ -166,10 +166,6 @@
 						}
 					},
 					error: function ( jqXHR, textStatus, errorThrown) {
-						// body...
-						console.log(jqXHR);
-						console.log(textStatus);
-						console.log(errorThrown);
 						self.ajaxError(textStatus);
 					},
 					complete: function ( jqXHR, textStatus ) {

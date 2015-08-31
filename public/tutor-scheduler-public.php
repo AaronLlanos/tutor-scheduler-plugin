@@ -184,11 +184,16 @@ class Tutor_Scheduler_Public {
 			exit("No naughty business please");
 		}
 
-		$sql = 'SELECT date_taken FROM '.$this->events_table_name.' WHERE id = '.$_POST["event_id"];
 		//Update the date_taken flag on this specific appointment
-		if (!$wpdb->update($this->events_table_name, array('date_taken' => 1), array('id' => $_REQUEST["event_id"]) )
-			 || !$wpdb->get_var($sql) != 0) {
+		$sql = 'SELECT date_taken FROM '.$this->events_table_name.' WHERE id = '.$_POST["event_id"];
+		//Check to make sure the flag is still 0 ex: RACE CONDITIONS!
+		if (!$wpdb->get_var($sql) != 0) {
 			$result["type"] = "error";
+			$result["message"] = "This appointment appears to have already been booked";
+		}
+		if (!$wpdb->update($this->events_table_name, array('date_taken' => 1), array('id' => $_REQUEST["event_id"]) )) {
+			$result["type"] = "error";
+			$result["message"] = "Could not connect to the database. Please try again later.";
 
 		}else{
 			$result["type"] = "success";
@@ -197,9 +202,6 @@ class Tutor_Scheduler_Public {
 		}
 
 		$result["event_id"] = $_REQUEST["event_id"];
-
-
-
 
 		if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
 			$result = json_encode($result);
