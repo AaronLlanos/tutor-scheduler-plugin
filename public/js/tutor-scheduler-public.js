@@ -101,7 +101,7 @@
 			$(".modal-success").addClass("bg-success");
 			$(".before-ajax-request").addClass("hidden");
 			$(".after-ajax-success").removeClass("hidden");
-			//Update the eventsJSON
+			//Update the eventsJSON by removing the booked event from the frontend
 			eventJSON = _.reject(eventJSON, function(eventObject){
 				return eventObject.id === event_id;
 			});
@@ -109,13 +109,91 @@
 				return eventObject.id === event_id;
 			});
 		},
-		ajaxError: function (errorMessage) {
+		ajaxError: function (resp) {
+			/**
+			 * Response types are as follows:
+			 * resp.type = ["db", "ajax", "race"];
+			 */
+			console.log(resp.error_type);
 			$(".modal-success").addClass("bg-danger");
-			alert(errorMessage);
+			if (resp.error_type === "race") {
+				$(".before-ajax-request").addClass("hidden");
+				$(".after-ajax-race-error").removeClass("hidden");
+				//Update the eventsJSON by removing the booked event from the frontend
+				eventJSON = _.reject(eventJSON, function(eventObject){
+					return eventObject.id === resp.event_id;
+				});
+				filteredEventJSON = _.reject(filteredEventJSON, function(eventObject){
+					return eventObject.id === resp.event_id;
+				});
+			}else{
+				alert(resp.message);
+			}
+		},
+		submitAjaxForm: function () {
+			// body...
+			var self = this;
+			var confirmationForm = $("#confirm-appointment");
+			var loadingSpinner = $(".loading-spinner");
+			confirmationForm.find("input").attr("disabled", "");
+			loadingSpinner.removeClass("hidden");
+
+			$.ajax({
+				type: "post",
+				dataType: "json",
+				url: myAjax.ajaxurl,
+				data : {
+					action: "confirm_tas_appointment",
+					event_id: confirmationForm.attr("data-eventID"),
+					nonce: confirmationForm.attr("data-nonce"),
+					tutor_id: confirmationForm.attr("data-tutorID"),
+					tutor_subject: confirmationForm.attr("data-tutorSubject"),
+					tutor_name: confirmationForm.attr("data-tutorName"),
+					event_date: confirmationForm.attr("data-eventDate"),
+					first_name: $("#first-name").val(),
+					last_name: $("#last-name").val(),
+					email: $("#email").val(),
+					classification: $("#classification").val(),
+					major: $("#major").val(),
+					note_to_tutor: $("#note-to-tutor").val(),
+					program: $("#program").val()
+				},
+				success: function(resp) {
+					if(resp.type == "success") {
+						self.ajaxSuccess(resp.event_id);
+					}
+					else {
+						self.ajaxError(resp);
+					}
+				},
+				error: function ( jqXHR, textStatus, errorThrown) {
+					var resp = {
+						error_type: "ajax",
+						message: textStatus,
+						type: "error",
+						event_id: -1
+					}
+					self.ajaxError(resp);
+				},
+				complete: function ( jqXHR, textStatus ) {
+					loadingSpinner.addClass("hidden");
+					confirmationForm.find("input").removeAttr("disabled");
+					$("#fullcalendar-frontend").fullCalendar('refetchEvents');
+				}
+			});
+		},
+		refreshModal: function () {
+			$(".modal-success").removeClass("bg-success");
+			$(".modal-success").removeClass("bg-danger");
+			$(".before-ajax-request").removeClass("hidden");
+			$(".after-ajax-success").addClass("hidden");
+			$(".after-ajax-race-error").addClass("hidden");
 		},
 		loadBindings: function () {
 			var self = this;
-
+			$('.modal').on('hidden.bs.modal', function () {
+			    self.refreshModal();
+			});
 			$("#course-select").on('change', function(){
 				var selectedCourseID = $(this).val();
 				var filteredTutorJSON;
@@ -132,48 +210,7 @@
 			});
 			$("#confirm-appointment").submit(function(e){
 				e.preventDefault();
-				var confirmationForm = $("#confirm-appointment");
-				var loadingSpinner = $(".loading-spinner");
-				confirmationForm.find("input").attr("disabled", "");
-				loadingSpinner.removeClass("hidden");
-
-				$.ajax({
-					type: "post",
-					dataType: "json",
-					url: myAjax.ajaxurl,
-					data : {
-						action: "confirm_tas_appointment",
-						event_id: confirmationForm.attr("data-eventID"),
-						nonce: confirmationForm.attr("data-nonce"),
-						tutor_id: confirmationForm.attr("data-tutorID"),
-						tutor_subject: confirmationForm.attr("data-tutorSubject"),
-						tutor_name: confirmationForm.attr("data-tutorName"),
-						event_date: confirmationForm.attr("data-eventDate"),
-						first_name: $("#first-name").val(),
-						last_name: $("#last-name").val(),
-						email: $("#email").val(),
-						classification: $("#classification").val(),
-						major: $("#major").val(),
-						note_to_tutor: $("#note-to-tutor").val(),
-						program: $("#program").val()
-					},
-					success: function(resp) {
-						if(resp.type == "success") {
-							self.ajaxSuccess(resp.event_id);
-						}
-						else {
-							self.ajaxError(resp.message);
-						}
-					},
-					error: function ( jqXHR, textStatus, errorThrown) {
-						self.ajaxError(textStatus);
-					},
-					complete: function ( jqXHR, textStatus ) {
-						loadingSpinner.addClass("hidden");
-						confirmationForm.find("input").removeAttr("disabled");
-						$("#fullcalendar-frontend").fullCalendar('refetchEvents');
-					}
-				});
+				self.submitAjaxForm();
 			});
 		},
 		loadCourseNames: function () {

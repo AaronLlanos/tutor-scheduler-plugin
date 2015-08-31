@@ -79,6 +79,21 @@
 				</div>
 			</div>
 		</span>
+		<span class="after-ajax-race-error hidden">
+			<div class="row">
+				<div class="col-xs-4">
+					<div class="dashicons dashicons-no" style="font-size: 240px; width: 240px; height: 240px; overflow: visible;"></div>
+				</div>
+				<div class="col-xs-8">
+					<h4>Uh oh! It appears this appointment is already taken!</h4>
+					<p>What to do now?</p> 
+					<ul>
+						<li>Please try to book another appointment.</li>
+						<li>If this page has been up for a while, please refresh the page to recieve a list of fresh appointments</li>
+					</ul>
+				</div>
+			</div>
+		</span>
 		<span class="after-ajax-success hidden">
 			<div class="row">
 				<div class="col-xs-4">
@@ -110,7 +125,7 @@
 	<div class="modal-footer modal-success">
 		<button class="btn btn-success before-ajax-request" type="submit">Confirm <img src="/wp-includes/js/tinymce/skins/lightgray/img/loader.gif" class="loading-spinner hidden"></button>
 		<button class="btn btn-danger before-ajax-request" type="button" data-dismiss="modal" aria-label="Close">Cancel</button>
-		<button class="btn btn-info after-ajax-success hidden" type="button" data-dismiss="modal" aria-label="Close">Close</button>
+		<button class="btn btn-info after-ajax-success after-ajax-race-error hidden" type="button" data-dismiss="modal" aria-label="Close">Close</button>
 		
 	</div>
 </form>

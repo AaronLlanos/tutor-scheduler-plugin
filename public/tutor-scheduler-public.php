@@ -187,12 +187,14 @@ class Tutor_Scheduler_Public {
 		//Update the date_taken flag on this specific appointment
 		$sql = 'SELECT date_taken FROM '.$this->events_table_name.' WHERE id = '.$_POST["event_id"];
 		//Check to make sure the flag is still 0 ex: RACE CONDITIONS!
-		if (!$wpdb->get_var($sql) != 0) {
+		if ($wpdb->get_var($sql) != 0) {
 			$result["type"] = "error";
-			$result["message"] = "This appointment appears to have already been booked";
+			$result["error_type"] = "race";
+			$result["message"] = "This appointment appears to have already been booked. Updating calendar now...";
 		}
-		if (!$wpdb->update($this->events_table_name, array('date_taken' => 1), array('id' => $_REQUEST["event_id"]) )) {
+		else if (!$wpdb->update($this->events_table_name, array('date_taken' => 1), array('id' => $_REQUEST["event_id"]) )) {
 			$result["type"] = "error";
+			$result["error_type"] = "db";
 			$result["message"] = "Could not connect to the database. Please try again later.";
 
 		}else{
