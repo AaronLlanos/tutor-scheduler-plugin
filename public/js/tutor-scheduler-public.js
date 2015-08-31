@@ -13,9 +13,9 @@
 			this.cleanUpDuplicates();
 		},
 		cleanUpDuplicates: function () {
-			var updatedButtons = $(".addthisevent-drop").children().last();
-			$(".addthisevent-drop").html("");
-			$(".addthisevent-drop").html(updatedButtons);
+			var updatedButtons = $(".addthisevent_dropdown").last();
+			$(".addthisevent_dropdown").remove();
+			$(".addthisevent-drop").append(updatedButtons);
 		}
 	}
 
@@ -97,14 +97,21 @@
 
 	//Course input functions
 	var CustomInputFilters = {
-		ajaxSuccess: function (argument) {
+		ajaxSuccess: function (event_id) {
 			$(".modal-success").addClass("bg-success");
 			$(".before-ajax-request").addClass("hidden");
 			$(".after-ajax-success").removeClass("hidden");
-
+			//Update the eventsJSON
+			eventJSON = _.reject(eventJSON, function(eventObject){
+				return eventObject.id === event_id;
+			});
+			filteredEventJSON = _.reject(filteredEventJSON, function(eventObject){
+				return eventObject.id === event_id;
+			});
 		},
-		ajaxError: function (argument) {
+		ajaxError: function (errorMessage) {
 			$(".modal-success").addClass("bg-danger");
+			alert(errorMessage);
 		},
 		loadBindings: function () {
 			var self = this;
@@ -188,7 +195,7 @@
 			var optionTemplate;
 			var tutorsList = $("#tutor-select");
 			var filteredTutorJSON = [];
-			tutorsList.html(''); //Clear list
+			tutorsList.empty(); //Clear list
 			//Load all tutors
 			tutorsList.append('<option value="" selected>Select a tutor</option>');
 			if (courseID === (-1)){
@@ -226,7 +233,6 @@
 		CustomInputFilters.loadTutorNames(-1);
 		CustomInputFilters.loadBindings();
 		addthisevent.settings({
-			license    : "replace-with-your-licensekey",
 			css        : false,
 			outlook    : {show:true, text:"Outlook"},
 			google     : {show:true, text:"Google"},
