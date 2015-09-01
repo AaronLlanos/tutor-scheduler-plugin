@@ -23,12 +23,6 @@
  				$insertSuccess = $this->executePostRequest();
 				$updateMessage = $this->getUpdateMessage($updateMessage, $insertSuccess);
 			}
-			$type = isset($_GET['type']) ? $_GET['type'] : '';
-			if (strcmp($type, 'remove') === 0) {
-				$insertSuccess = $wpdb->delete( $this->tutor_table_name, array('id' => $_GET['id']) );
-				$updateMessage = $this->getUpdateMessage($updateMessage, $insertSuccess);
-				
-			}
 
 			//Grab the students
 			$students = json_decode($this->get_tutor_students(), true);
@@ -39,6 +33,7 @@
 		}
 
 		public function executePostRequest(){
+			global $wpdb;
 			$insertSuccess = true;
 			//Check and get type from URL
 			$type = isset($_GET['type']) ? $_GET['type'] : '';
@@ -51,10 +46,36 @@
 
 				return $insertCourse && $updateSchedule;
 			}
+			else if (strcmp($type, 'remove') === 0) {
+				$studentID = $_POST["student_id"];
+				if (!$wpdb->delete( $this->tutor_table_name, array('id' => $_POST['student_id']) )) {
+					return false;
+				}
+				/**
+				 * Should email all students who have an appointment with this tutor!!!!!!!!
+				 */
+					
+				/**
+				 *
+				 * Should decrement course tutor count for each course this tutor was apart of. 
+				 */
+				return $this->updateCourses($studentID, 'remove') && $this->updateSchedule($studentID, 'remove');
+				/**
+				 * Should remove all events tied to this tutor
+				 */
+				;
+			}
 
 			return $insertSuccess;
 		}
 
+		/**
+		 * Properly count how many courses in the array. This function 
+		 * takes into account that explode() may return count(array) = 1 even though an 
+		 * arrray is empty.
+		 * @param  [type] $courses [description]
+		 * @return [type]          [description]
+		 */
 		public function getCourseCount( $courses ){
 
 			$courseArray = explode(",", $courses);
@@ -118,32 +139,60 @@
 		 * @param  int|false $studentID False if student not inserted (see addStudent()). Int
 		 * @return bool            return true or false on success or failure respectively.
 		 */
-		public function updateCourses($studentID){
+		public function updateCourses($studentID, $updateType = 'add'){
 			global $wpdb;
 
 			if (!$studentID) {
 				return false;
 			}
 
-			if ($this->getCourseCount($_POST["courses"]) == 0) {
-				return true;
-			}
-
-			$courseArray = explode(",", $_POST["courses"]);
-
 			//Update C2T table based on $studentID.
+			$courseArray = [];
+			$courseSQL = false;
+			$courseRows = [];
 			$table = $wpdb->prefix . 'tutor_scheduler_C2T';
+
+			if (strcmp($updateType, 'remove') == 0) {
+				//Get all the ID's of courses that are associated with this tutor
+				$courseSQL = '
+								SELECT *
+								FROM ' . $table .'
+								WHERE tutor_ID = ' . $studentID;
+
+				$courseRows = $wpdb->get_results($courseSQL);
+				foreach ($courseRows as $row) {
+					// echo $row;
+					array_push($courseArray, $row->course_ID);
+				}
+
+				//Then delete it.
+				$wpdb->delete($table, array('tutor_ID' => $studentID), array('%d'));
+				
+			}else{
+				//Since we are in the add section, get the array of courses to update
+				if ($this->getCourseCount($_POST["courses"]) == 0) {
+					return true;
+				}
+				$courseArray = explode(",", $_POST["courses"]);
+			}
 			
+
 			$format = array('%d', '%d');
 			foreach ($courseArray as $courseID) {
-				$courseData = array('course_id' => $courseID, 'tutor_id' => $studentID);
-				if (!$wpdb->insert( $table, $courseData, $format )) {
-			 		return false;
+				$courseData = array('course_ID' => $courseID, 'tutor_ID' => $studentID);
+				if (strcmp($updateType, 'add') == 0) {
+					if (!$wpdb->insert( $table, $courseData, $format )) {
+				 		return false;
+					}
 				}
 				//Update course tutor count
 				$tutorCountQuery = 'SELECT tutor_count FROM '. $this->courses_table_name . ' WHERE id = ' . $courseID;
 				$tutorCount = $wpdb->get_var($tutorCountQuery);
-				$tutorCount += 1;
+				if (strcmp($updateType, 'add') == 0) {
+					$tutorCount += 1;
+				}else{
+					$tutorCount -= 1;
+				}
 				$wpdb->update(
 								$this->courses_table_name, 
 								array('tutor_count' => $tutorCount),
@@ -158,30 +207,35 @@
 		 * @param  int|false $studentID False if student not inserted (see addStudent()). Int
 		 * @return bool            return true or false on success or failure respectively.
 		 */
-		public function updateSchedule($studentID){
+		public function updateSchedule($studentID, $updateType = 'add'){
 			global $wpdb;
 			//Add dates to table
 			$events_table_name = $wpdb->prefix . 'tutor_scheduler_event';
 
-			$events = explode(", ", $_POST["schedule"]);
-			$scheduleSQLFormat = array("%d", "%s", "%s", "%s", "%d", "%d");
-			$eventObject;
+			if (strcmp($updateType, 'add') == 0) {
+				$events = explode(", ", $_POST["schedule"]);
+				$scheduleSQLFormat = array("%d", "%s", "%s", "%s", "%d", "%d");
+				$eventObject;
 
-			foreach ($events as $eventObjectString){
-				$eventObj = json_decode(stripslashes($eventObjectString));
-				$scheduleData = array(
-									'tutor_ID' => $studentID,
-									'title' => $eventObj->{'title'},
-									'start' => $eventObj->{'start'},
-									'end' => $eventObj->{'end'},
-									'parent_ID' => $eventObj->{'id'},
-									'date_taken' => 0
-								 );
+				foreach ($events as $eventObjectString){
+					$eventObj = json_decode(stripslashes($eventObjectString));
+					$scheduleData = array(
+										'tutor_ID' => $studentID,
+										'title' => $eventObj->{'title'},
+										'start' => $eventObj->{'start'},
+										'end' => $eventObj->{'end'},
+										'parent_ID' => $eventObj->{'id'},
+										'date_taken' => 0
+									 );
 
-				if (!$wpdb->insert($events_table_name, $scheduleData, $scheduleSQLFormat)) {
-					return false;
+					if (!$wpdb->insert($events_table_name, $scheduleData, $scheduleSQLFormat)) {
+						return false;
+					}
+
 				}
-
+			}else{
+				//Remove the events from the database
+				$wpdb->delete($events_table_name, array('tutor_ID' => $studentID), array('%d'));
 			}
 			return true;			
 		}
@@ -227,7 +281,7 @@
 					$studentsString .= "<td>" . $student["classification"] . "</td>";
 					$studentsString .= "<td>" . $student["course_count"] . "</td>";
 					$studentsString .= "<td>" . $student["date_added"] . "</td>";
-					$studentsString .= '<td><a href="'.admin_url('admin.php?page=' . $this->tutor_slug . '&type=remove&id='.$student["id"]).'" class="btn btn-xs btn-danger student-remove" data-name="' . $student["first_name"] . ' ' . $student["last_name"] . '">X</a></td>';
+					$studentsString .= '<td><button class="btn btn-xs btn-danger student-remove" data-name="' . $student["first_name"] . ' ' . $student["last_name"] . '" data-tutorID="'.$student["id"].'">X</a></td>';
 				$studentsString .= "</tr>";
 			}
 

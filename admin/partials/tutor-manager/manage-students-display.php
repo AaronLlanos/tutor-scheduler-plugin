@@ -44,7 +44,7 @@
 		</div>
 		<div role="tabpanel" id="manage-tutor" class="tab-pane fade">
 			<?php require_once 'tutor-table.php'; ?>
-			<form id="remove-student-form" class="hidden" method="POST" action="<?php echo admin_url('admin.php?page=' . $this->tutor_slug . '&type=remove'); ?>"><input></form>
+			<form id="student-remove-form" class="hidden" method="POST" action="<?php echo admin_url('admin.php?page=' . $this->tutor_slug . '&type=remove'); ?>"><input id="student-remove-input" name="student_id"></form>
 		</div>
 	</div>
 

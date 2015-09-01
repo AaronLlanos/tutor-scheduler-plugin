@@ -220,6 +220,9 @@
 				if (confirmedVal === false) {
 					//Stop propigation
 					event.preventDefault();
+				}else{
+					$("#student-remove-input").val($(this).attr("data-tutorID"));
+					$("#student-remove-form").submit();
 				}
 			});
 		}
