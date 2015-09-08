@@ -31,7 +31,8 @@ class Tutor_Scheduler_Activator {
 
 		$courses_table_name = $wpdb->prefix . 'tutor_scheduler_courses';
 		$tutors_table_name = $wpdb->prefix . 'tutor_scheduler_tutors';
-		$events_table_name = $wpdb->prefix . 'tutor_scheduler_event';
+		$events_table_name = $wpdb->prefix . 'tutor_scheduler_events';
+		$booked_events_table_name = $wpdb->prefix . 'tutor_scheduler_booked_events';
 		$course2Tutor_table_name = 	$wpdb->prefix . 'tutor_scheduler_C2T';
 
 		$charset_collate = $wpdb->get_charset_collate();
@@ -58,6 +59,18 @@ class Tutor_Scheduler_Activator {
 			PRIMARY KEY  id (id)
 		); $charset_collate";
 		dbDelta( $tutors_sql );
+
+		$booked_event_sql = "CREATE TABLE $booked_events_table_name (
+			id  mediumint(9) NOT NULL AUTO_INCREMENT,
+			event_ID  mediumint(9) NOT NULL,
+			tutor_ID  mediumint(9) NOT NULL,
+			start  datetime NOT NULL,
+			tutee_first_name tinytext NOT NULL,
+			tutee_last_name tinytext NOT NULL,
+			tutee_email  tinytext NOT NULL,
+			PRIMARY KEY  id (id)
+		); $charset_collate";
+		dbDelta( $booked_event_sql );
 
 		$events_sql = "CREATE TABLE $events_table_name (
 			id  mediumint(9) NOT NULL AUTO_INCREMENT,

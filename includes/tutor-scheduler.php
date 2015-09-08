@@ -63,7 +63,8 @@ class Tutor_Scheduler {
 		$this->courses_table_name = 'tutor_scheduler_courses';
 		$this->tutors_table_name = 'tutor_scheduler_tutors';
 		$this->C2T_table_name = 'tutor_scheduler_C2T';
-		$this->events_table_name = 'tutor_scheduler_event';
+		$this->events_table_name = 'tutor_scheduler_events';
+		$this->booked_events_table_name = 'tutor_scheduler_booked_events';
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
@@ -150,7 +151,10 @@ class Tutor_Scheduler {
 								$this->get_student_slug_name(), 
 								$this->get_courses_slug_name(),
 								$this->get_tutors_table_name(), 
-								$this->get_courses_table_name()
+								$this->get_courses_table_name(),
+								$this->get_C2T_table_name(),
+								$this->get_events_table_name(),
+								$this->get_booked_events_table_name()
 						);
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
@@ -176,7 +180,8 @@ class Tutor_Scheduler {
 							$this->get_courses_table_name(),
 							$this->get_tutors_table_name(), 
 							$this->get_C2T_table_name(),
-							$this->get_events_table_name()
+							$this->get_events_table_name(),
+							$this->get_booked_events_table_name()
 						);
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
@@ -280,6 +285,11 @@ class Tutor_Scheduler {
 	public function get_events_table_name(){
 		global $wpdb;
 		return $wpdb->prefix . $this->events_table_name;
+	}
+
+	public function get_booked_events_table_name(){
+		global $wpdb;
+		return $wpdb->prefix . $this->booked_events_table_name;
 	}
 
 }
