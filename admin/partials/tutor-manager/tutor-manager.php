@@ -5,10 +5,12 @@
 	class TutorManager extends Tutor_Scheduler_Admin
 	{
 		
-		public function __construct($tutor_table_name, $tutor_slug, $courses_table_name){
+		public function __construct($tutor_table_name, $tutor_slug, $courses_table_name, $C2T_table_name, $events_table_name){
 			$this->tutor_table_name = $tutor_table_name;
 			$this->tutor_slug = $tutor_slug;
 			$this->courses_table_name = $courses_table_name;
+			$this->C2T_table_name = $C2T_table_name;
+			$this->events_table_name = $events_table_name;
 		}
 		public function run(){
 			global $wpdb;
@@ -27,6 +29,15 @@
 			//Grab the students
 			$students = json_decode($this->get_tutor_students(), true);
 			$courses = json_decode($this->get_tutor_courses(), true);
+
+			$tutorJSON = $this->get_tutor_students();
+			$coursesJSON = $this->get_tutor_courses();
+			$C2TJSON = $this->get_C2T();
+
+			echo 	'<script type="text/javascript">var tutorJSON = '.$tutorJSON.';
+													var coursesJSON = '.$coursesJSON.';
+													var C2TJSON = '.$C2TJSON.';
+					</script>';
 
 			require_once 'manage-students-display.php';
 
@@ -210,7 +221,7 @@
 		public function updateSchedule($studentID, $updateType = 'add'){
 			global $wpdb;
 			//Add dates to table
-			$events_table_name = $wpdb->prefix . 'tutor_scheduler_event';
+			$events_table_name = $wpdb->prefix . 'tutor_scheduler_events';
 
 			if (strcmp($updateType, 'add') == 0) {
 				$events = explode(", ", $_POST["schedule"]);
@@ -221,10 +232,10 @@
 					$eventObj = json_decode(stripslashes($eventObjectString));
 					$scheduleData = array(
 										'tutor_ID' => $studentID,
-										'title' => $eventObj->{'title'},
-										'start' => $eventObj->{'start'},
-										'end' => $eventObj->{'end'},
-										'parent_ID' => $eventObj->{'id'},
+										'title' => $eventObj->title,
+										'start' => $eventObj->start,
+										'end' => $eventObj->end,
+										'parent_ID' => $eventObj->id,
 										'date_taken' => 0
 									 );
 

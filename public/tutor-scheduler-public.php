@@ -53,7 +53,8 @@ class Tutor_Scheduler_Public {
 									$courses_table_name,
 									$tutor_table_name,
 									$C2T_table_name,
-									$events_table_name 
+									$events_table_name, 
+									$booked_events_table_name 
 								) {
 
 		$this->plugin_name = $plugin_name;
@@ -62,6 +63,7 @@ class Tutor_Scheduler_Public {
 		$this->tutor_table_name = $tutor_table_name;
 		$this->C2T_table_name = $C2T_table_name;
 		$this->events_table_name = $events_table_name;
+		$this->booked_events_table_name = $booked_events_table_name;
 
 	}
 
@@ -185,9 +187,10 @@ class Tutor_Scheduler_Public {
 		}
 
 		//Update the date_taken flag on this specific appointment
-		$sql = 'SELECT date_taken FROM '.$this->events_table_name.' WHERE id = '.$_POST["event_id"];
+		$sql = 'SELECT date_taken, start FROM '.$this->events_table_name.' WHERE id = '.$_POST["event_id"];
+		$eventObjectToUpdate = $wpdb->get_row($sql);
 		//Check to make sure the flag is still 0 ex: RACE CONDITIONS!
-		if ($wpdb->get_var($sql) != 0) {
+		if ($eventObjectToUpdate->date_taken != 0) {
 			$result["type"] = "error";
 			$result["error_type"] = "race";
 			$result["message"] = "This appointment appears to have already been booked. Updating calendar now...";
@@ -201,6 +204,17 @@ class Tutor_Scheduler_Public {
 			$result["type"] = "success";
 			//Send a confirmation email to student
 			$this->send_confirmation_email($_REQUEST["tutor_id"]);	
+			//Save to booked events
+			$booked_data = array(
+									'event_ID' => $_POST["event_id"],
+									'tutor_ID' => $_REQUEST["tutor_id"],
+									'start' => $eventObjectToUpdate->start,
+									'tutee_first_name' => $_POST["first_name"],
+									'tutee_last_name' => $_POST["last_name"],
+									'tutee_email' => $_POST["email"]
+								);
+			$booked_data_format = array('%d', '%d', '%s', '%s', '%s', '%s');
+			$wpdb->insert($this->booked_events_table_name, $booked_data, $booked_data_format);
 		}
 
 		$result["event_id"] = $_REQUEST["event_id"];

@@ -114,7 +114,7 @@
 			 * Response types are as follows:
 			 * resp.type = ["db", "ajax", "race"];
 			 */
-			console.log(resp.error_type);
+			// console.log(resp.error_type);
 			$(".modal-success").addClass("bg-danger");
 			if (resp.error_type === "race") {
 				$(".before-ajax-request").addClass("hidden");
@@ -159,6 +159,7 @@
 					program: $("#program").val()
 				},
 				success: function(resp) {
+					// console.log("Success!");
 					if(resp.type == "success") {
 						self.ajaxSuccess(resp.event_id);
 					}
@@ -167,6 +168,9 @@
 					}
 				},
 				error: function ( jqXHR, textStatus, errorThrown) {
+					// console.log(jqXHR);
+					// console.log(textStatus);
+					// console.log(errorThrown);
 					var resp = {
 						error_type: "ajax",
 						message: textStatus,

@@ -1,6 +1,8 @@
 (function( $ ) {
 	'use strict';
 
+	var registeredCoursesJSON = [];
+	var notRegisteredcoursesJSON = [];
 	/**
 	 * Functions for adding courses to student scheduler
 	 */
@@ -70,27 +72,29 @@
 	};
 
 	var FullCalendar = {
-		recurrDates: function(recurrUntil, scheduledDates){
+		recurrDates: function(recurrUntil){
 			var self = this;
 			var start;
+			var scheduledDates = $("#fullcalendar").fullCalendar('clientEvents');
+			$("#fullcalendar").fullCalendar('removeEvents');
+
 			recurrUntil = moment(recurrUntil, "YYYY-MM-DD");
 
 			$.each(scheduledDates, function(i, eventObject){
-				eventObject.id = i;
-				start = eventObject.start.add({minutes: 60});
-				while (start.isBefore(recurrUntil)){
+				self.addNewEvent(eventObject.start, i);
+				start = eventObject.start;
+				while (start.add({weeks: 1}).isBefore(recurrUntil)){
 					//Must subtract an hour because WP adds "1" to the timestamp rounding it up an hour
-					start = start.add({weeks: 1}).subtract({minutes: 60});
+					start = start.subtract({minutes: 60});
 					self.addNewEvent(start, i);
 				}
-
 			});
 
 		},
 		popup: function(){
 			var self = this;
 			$('#fullcalendar_popover').fullCalendar({
-				editable: true,
+				editable: false,
 		        timezone: "America/Chicago",
 				dayClick: function (date, jsEvent, view) {
 					//Input the value into input.
@@ -109,7 +113,7 @@
 		        columnFormat: 'dddd',
 		        allDaySlot: false,
 		        height: "auto",
-		        minTime: "12:00:00",
+		        minTime: "07:00:00",
 		        maxTime: "20:00:00",
 		        timezone: "America/Chicago",
 		        weekends: false,
@@ -128,16 +132,18 @@
 				return event == calEvent;
 			});
 		},
-		addNewEvent: function(date, id){
+		addNewEvent: function(customDate, id){
 
 			var tutorName = $("#first-name").val() + " " + $("#last-name").val();
-			//Assume no name is less than 4 charactersl, including the space seperating first and last
+			var startTime = customDate.format();
+			var endTime = customDate.add({hours: 1}).format();
+			//Assume no name is less than 4 characters, including the space seperating first and last
 			if (tutorName.length > 4){
 				var eventObject = {
 					id: id,
 					title: tutorName,
-					start: date.format(),
-					end: date.add({hours: 1}),
+					start: startTime,
+					end: endTime,
 					description: "Tutoring with " + tutorName,
 					editable: true
 				}
@@ -151,6 +157,7 @@
 	}
 
 	var TutorScheduler = {
+
 		serializeCourses: function(){
 			var coursesArray = $("#courses-table").find(".success");
 			var courses = [];
@@ -159,19 +166,18 @@
 				courses.push($(course).find("input").attr("data-courseID"));
 			});
 			$("input#courses").val(courses.toString());
-			// console.log("The courses val is:"); //Debug
-			// console.log($("input#courses").val());
 
 			return true;
 		},
-		serializeDates: function(scheduledDates){
+		serializeDates: function(){
 			var schedule = '';
 			var newCalObject = {};
+			var scheduledDates = $("#fullcalendar").fullCalendar('clientEvents');
 
 			$(scheduledDates).each(function(i, calObject){
 				newCalObject = {
-									start: calObject.start.format(),
-									end: calObject.end.format(),
+									start: calObject.start,
+									end: calObject.end,
 									title: calObject.title,
 									id: calObject.id,
 									description: calObject.description
@@ -188,19 +194,76 @@
 		},
 		loadBindings: function () {
 
+			//Manage tutor courses
+			$("#tutor-list-m-courses").on('change', function(){
+				var selectedTutorID = $(this).val();
+				var courseIDs = _.filter(C2TJSON, function(C2TRow){
+					return C2TRow.tutor_ID === selectedTutorID;
+				});
+				registeredCoursesJSON = [];
+				notRegisteredcoursesJSON = [];
+				$.each(courseIDs, function(i, C2TRow){
+					var coursesToAdd = _.filter(coursesJSON, function(coursesRow){
+						return C2TRow.course_ID === coursesRow.id;
+					});
+					$.merge(registeredCoursesJSON, coursesToAdd);
+				});
+				$.each(courseIDs, function(i, C2TRow){
+					notRegisteredcoursesJSON = _.filter(coursesJSON, function(coursesRow){
+						return courseIDs.course_ID === coursesRow.id;
+					});
+					$.merge(registeredCoursesJSON, coursesToAdd);
+				});
+			});
+
+			$("#update-tutor-courses").click(function(){
+				e.preventDefault();
+				$.ajax({
+					type: "post",
+					dataType: "json",
+					url: myAjax.ajaxurl,
+					data : {
+						action: "update_tutor_information",
+						type: 'update_courses',
+						nonce: $("#tutor-list-m-courses").attr("data-nonce"),
+						tutor_id: selectedTutorID,
+						
+					},
+					success: function(resp) {
+						if(resp.type == "success") {
+							// self.ajaxSuccess(resp.event_id);
+						}
+						else {
+							// self.ajaxError(resp);
+						}
+					},
+					error: function ( jqXHR, textStatus, errorThrown) {
+						var resp = {
+							error_type: "ajax",
+							message: textStatus,
+							type: "error",
+							event_id: -1
+						}
+						// self.ajaxError(resp);
+					},
+					complete: function ( jqXHR, textStatus ) {
+						// loadingSpinner.addClass("hidden");
+						// confirmationForm.find("input").removeAttr("disabled");
+						// $("#fullcalendar-frontend").fullCalendar('refetchEvents');
+					}
+				});
+			});
 			//Create a calendar
 			$("#student-form").submit(function(event){
 				//Serialize data for POST object before submit event
-				var scheduledDates = $("#fullcalendar").fullCalendar('clientEvents');
 				var recurrUntil = $("#recurr_until").val();
 
-				FullCalendar.recurrDates(recurrUntil, scheduledDates);
+				FullCalendar.recurrDates(recurrUntil);
 
 				if ( TutorScheduler.serializeCourses() === false ){
 					event.preventDefault();
 				}
-				scheduledDates = $("#fullcalendar").fullCalendar('clientEvents');
-				if ( TutorScheduler.serializeDates(scheduledDates) === false ){
+				if ( TutorScheduler.serializeDates() === false ){
 					event.preventDefault();
 				}
 				this.submit();

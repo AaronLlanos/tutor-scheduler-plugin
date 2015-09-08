@@ -40,7 +40,7 @@
 			<?php require_once 'add-tutor-form.php'; ?>
 		</div>
 		<div role="tabpanel" id="manage-tutor-courses" class="tab-pane fade">
-			...
+			<?php require_once 'manage-tutor-courses.php'; ?>
 		</div>
 		<div role="tabpanel" id="manage-tutor" class="tab-pane fade">
 			<?php require_once 'tutor-table.php'; ?>

@@ -56,7 +56,17 @@ class Tutor_Scheduler_Admin {
 	 * @param      string    $plugin_name       The name of this plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version, $top_level_slug, $student_slug, $courses_slug, $tutor_table_name, $courses_table_name ) {
+	public function __construct( $plugin_name,
+									$version,
+									$top_level_slug,
+									$student_slug,
+									$courses_slug,
+									$tutor_table_name,
+									$courses_table_name,
+									$C2T_table_name,
+									$events_table_name, 
+									$booked_events_table_name 
+								) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
@@ -65,6 +75,8 @@ class Tutor_Scheduler_Admin {
 		$this->courses_slug = $courses_slug;
 		$this->tutor_table_name = $tutor_table_name;
 		$this->courses_table_name = $courses_table_name;
+		$this->C2T_table_name = $C2T_table_name;
+		$this->events_table_name = $events_table_name;
 		$this->error_message = '';
 
 	}
@@ -120,9 +132,12 @@ class Tutor_Scheduler_Admin {
 		wp_enqueue_script( 'bootstrap', plugin_dir_url( __FILE__ ) . 'js/libs/bootstrap.min.js', array( 'jquery' ), $this->version, false );
 		//FullCalendar
 		wp_enqueue_script( 'fullcalendar', plugin_dir_url( __FILE__ ) . 'js/libs/full-calendar.min.js', array( 'jquery', 'moment' ), $this->version, false );
-		
+		//Underscore
+		wp_enqueue_script( 'underscore', plugin_dir_url( __FILE__ ) . 'js/libs/underscore.min.js', array(), '1.8.3', false );
+		//Plugin functions
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/tutor-scheduler-admin.js', array( 'jquery', 'moment', 'bootstrap', 'fullcalendar' ), $this->version, false );
-		// wp_localize_script( 'FullCalendarFuncs',  );
+		
+		wp_localize_script( $this->plugin_name, 'myAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));
 	}
 
 
@@ -147,7 +162,7 @@ class Tutor_Scheduler_Admin {
 	public function load_manage_students_page(){
 
 		require_once 'partials/tutor-manager/tutor-manager.php';
-		$tutorManager = new TutorManager($this->tutor_table_name, $this->student_slug, $this->courses_table_name);
+		$tutorManager = new TutorManager($this->tutor_table_name, $this->student_slug, $this->courses_table_name, $this->C2T_table_name, $this->events_table_name);
 		$tutorManager->run();
 		
 	}
@@ -239,6 +254,25 @@ class Tutor_Scheduler_Admin {
 		return $updateMessage;
 	}
 
+	public function update_tutor_information() {
+		global $wpdb;
+
+		if ( !wp_verify_nonce( $_REQUEST['nonce'], "update_tutor_information")) {
+			exit("No naughty business please");
+		}
+
+		if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+			$result = json_encode($result);
+			echo $result;
+		}
+		else {
+			header("Location: ".$_SERVER["HTTP_REFERER"]);
+		}
+
+		die();
+	}
+
+
 	/**
 	 * [get_tutor_courses description]
 	 * @return 	array|boolean return array of tutor courses on success. Else, return false.
@@ -258,5 +292,38 @@ class Tutor_Scheduler_Admin {
 
 		return json_encode($courses);
 	}
+
+	public function get_C2T() {
+		global $wpdb;
+		
+		$query = "
+			SELECT *
+			FROM " . $this->C2T_table_name . "
+			ORDER BY id
+			";
+
+		$C2T = $wpdb->get_results($query);
+
+		return json_encode($C2T);
+	}
+
+	/**
+	 * [get_C2T description]
+	 * @return [type] [description]
+	 */
+	// public function get_events($eventID = -1) {
+	// 	global $wpdb;
+		
+	// 	$query = "
+	// 			SELECT *
+	// 			FROM " . $this->events_table_name . "
+	// 			WHERE date_taken = 0
+	// 			";
+		
+
+	// 	$events = $wpdb->get_results($query);
+
+	// 	return json_encode($events);
+	// }
 
 }
