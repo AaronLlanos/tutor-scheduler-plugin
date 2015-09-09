@@ -101,7 +101,7 @@ class Tutor_Scheduler_Admin {
 		 */
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/tutor-scheduler-admin.css', array(), $this->version, 'all' );
 		//Bootstrap
-		wp_enqueue_style( 'bootstrap', plugin_dir_url( __FILE__ ) . 'css/bootstrap.min.css', array(), $this->version, 'all' );
+		// wp_enqueue_style( 'bootstrap', plugin_dir_url( __FILE__ ) . 'css/bootstrap.min.css', array(), $this->version, 'all' );
 		//FullCalendar
 		wp_enqueue_style( 'fullcalendar', plugin_dir_url( __FILE__ ) . 'css/full-calendar.min.css', array(), $this->version, 'all' );
 		

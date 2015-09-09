@@ -37,7 +37,7 @@ class Tutor_Scheduler_Activator {
 
 		$charset_collate = $wpdb->get_charset_collate();
 
-		$courses_sql = "CREATE TABLE $courses_table_name (
+		$courses_sql = "CREATE TABLE IF NOT EXISTS $courses_table_name (
 			id  mediumint(9) NOT NULL AUTO_INCREMENT,
 			date_added  datetime NOT NULL,
 			tutor_count  mediumint(9) DEFAULT 0 NOT NULL,
@@ -46,7 +46,7 @@ class Tutor_Scheduler_Activator {
 		); $charset_collate";
 		dbDelta( $courses_sql );
 
-		$tutors_sql = "CREATE TABLE $tutors_table_name (
+		$tutors_sql = "CREATE TABLE IF NOT EXISTS $tutors_table_name (
 			id  mediumint(9) NOT NULL AUTO_INCREMENT,
 			first_name  tinytext NOT NULL,
 			last_name  tinytext NOT NULL,
@@ -60,7 +60,7 @@ class Tutor_Scheduler_Activator {
 		); $charset_collate";
 		dbDelta( $tutors_sql );
 
-		$booked_event_sql = "CREATE TABLE $booked_events_table_name (
+		$booked_event_sql = "CREATE TABLE IF NOT EXISTS $booked_events_table_name (
 			id  mediumint(9) NOT NULL AUTO_INCREMENT,
 			event_ID  mediumint(9) NOT NULL,
 			tutor_ID  mediumint(9) NOT NULL,
@@ -72,7 +72,7 @@ class Tutor_Scheduler_Activator {
 		); $charset_collate";
 		dbDelta( $booked_event_sql );
 
-		$events_sql = "CREATE TABLE $events_table_name (
+		$events_sql = "CREATE TABLE IF NOT EXISTS $events_table_name (
 			id  mediumint(9) NOT NULL AUTO_INCREMENT,
 			parent_ID  mediumint(9) NOT NULL,
 			tutor_ID  mediumint(9) NOT NULL,
@@ -84,7 +84,7 @@ class Tutor_Scheduler_Activator {
 		); $charset_collate";
 		dbDelta( $events_sql );
 
-		$course2Tutor_sql = "CREATE TABLE $course2Tutor_table_name (
+		$course2Tutor_sql = "CREATE TABLE IF NOT EXISTS $course2Tutor_table_name (
 			id  mediumint(9) NOT NULL AUTO_INCREMENT,
 			course_ID  mediumint(9) NOT NULL,
 			tutor_ID  mediumint(9) NOT NULL,
@@ -96,6 +96,8 @@ class Tutor_Scheduler_Activator {
  		// echo $wpdb->last_error;
 
 		add_option( 'tsp_db_version', $tsp_db_version );
+
+		file_put_contents(dirname(__file__).'/error_activation.txt', ob_get_contents());
 	}
 
 }
