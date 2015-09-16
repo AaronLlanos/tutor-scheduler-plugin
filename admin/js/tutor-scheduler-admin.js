@@ -74,15 +74,15 @@
 	var FullCalendar = {
 		recurrDates: function(recurrUntil){
 			var self = this;
-			var start;
+			var start, end;
 			var scheduledDates = $("#fullcalendar").fullCalendar('clientEvents');
 			$("#fullcalendar").fullCalendar('removeEvents');
 
 			recurrUntil = moment(recurrUntil, "YYYY-MM-DD");
 
 			$.each(scheduledDates, function(i, eventObject){
-				self.addNewEvent(eventObject.start, i);
 				start = eventObject.start;
+				self.addNewEvent(start, i);
 				while (start.add({weeks: 1}).isBefore(recurrUntil)){
 					//Must subtract an hour because WP adds "1" to the timestamp rounding it up an hour
 					start = start.subtract({minutes: 60});
@@ -108,7 +108,6 @@
 			var self = this;
 			$('#fullcalendar').fullCalendar({
 		        // put your options and callbacks here
-		        editable: true,
 		        header: false,
 		        columnFormat: 'dddd',
 		        allDaySlot: false,
@@ -136,7 +135,8 @@
 
 			var tutorName = $("#first-name").val() + " " + $("#last-name").val();
 			var startTime = customDate.format();
-			var endTime = customDate.add({hours: 1}).format();
+			var timeToAdd = $("#time-to-add").val();
+			var endTime = customDate.add({minutes: timeToAdd}).format();
 			//Assume no name is less than 4 characters, including the space seperating first and last
 			if (tutorName.length > 4){
 				var eventObject = {
@@ -144,8 +144,7 @@
 					title: tutorName,
 					start: startTime,
 					end: endTime,
-					description: "Tutoring with " + tutorName,
-					editable: true
+					description: "Tutoring with " + tutorName
 				}
 		        $("#fullcalendar").fullCalendar('renderEvent', eventObject, true);
 			}else{
@@ -157,6 +156,14 @@
 	}
 
 	var TutorScheduler = {
+
+		loadCourses: function (){
+			var self = this;
+			/**
+			 * Modify this function!!!
+			 */
+			
+		},
 
 		serializeCourses: function(){
 			var coursesArray = $("#courses-table").find(".success");
@@ -193,7 +200,7 @@
 
 		},
 		loadBindings: function () {
-
+			var self = this;
 			//Manage tutor courses
 			$("#tutor-list-m-courses").on('change', function(){
 				var selectedTutorID = $(this).val();
@@ -214,6 +221,7 @@
 					});
 					$.merge(registeredCoursesJSON, coursesToAdd);
 				});
+				self.loadCourses();
 			});
 
 			$("#update-tutor-courses").click(function(){

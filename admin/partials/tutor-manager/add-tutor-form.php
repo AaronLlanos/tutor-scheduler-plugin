@@ -62,8 +62,19 @@
 	</div>
 	<hr>
 	<div class="container">
-		<label for="recurr_until">Recurr Dates Until: (YYYY-MM-DD)</label>
-		<input id="recurr_until" name="recurr_until" type="text" required></input><a tabindex="0" class="btn btn-defalut" id="calendar_pop" role="button" ><span class="dashicons dashicons-calendar-alt"></span></a tabindex="0">
+		<div class="col-xs-9">
+			<label for="recurr_until">Recurr Dates Until: (YYYY-MM-DD)</label>
+			<span id="calendar_pop">
+				<input id="recurr_until" name="recurr_until" type="text" autocomplete="off" required></input>
+			</span>
+		</div>
+		<div class="col-xs-3 form-group">
+			<select name="time-to-add" id="time-to-add" class="form-control" form="student-form" required>
+				<option selected>Tutoring Time Block</option>
+				<option value="30">30 minutes</option>
+				<option value="60">60 minutes</option>
+			</select>
+		</div>
 		<br>
 		<div id='fullcalendar'></div>
 	</div>
