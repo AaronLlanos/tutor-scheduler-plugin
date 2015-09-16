@@ -7,6 +7,6 @@
 				$studentsString .= $student["first_name"] . $student["last_name"];
 			$studentsString .= "</option>";
 		}
-		echo $studentsString
+		echo $studentsString;
 	 ?>
 </select>

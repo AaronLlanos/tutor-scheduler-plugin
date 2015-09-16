@@ -158,9 +158,9 @@
 			}
 
 			//Update C2T table based on $studentID.
-			$courseArray = [];
+			$courseArray = array();
 			$courseSQL = false;
-			$courseRows = [];
+			$courseRows = array();
 			$table = $wpdb->prefix . 'tutor_scheduler_C2T';
 
 			if (strcmp($updateType, 'remove') == 0) {
