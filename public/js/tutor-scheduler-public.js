@@ -35,9 +35,18 @@
 				events: function(start, end, timezone, callback){
 					callback(filteredEventJSON);
 				},
+				eventLimit: true, // for all non-agenda views
+			    views: {
+			        agenda: {
+			            eventLimit: 6 // adjust to 6 only for agendaWeek/agendaDay
+			        },
+			        month: {
+			        	eventLimit: 3
+			        }
+			    },
 				slotEventOverlap: true,
 		        height: "auto",
-		        minTime: "12:00:00",
+		        minTime: "08:00:00",
 		        maxTime: "20:00:00",
 		        timezone: "America/Chicago",
 		        defaultView: 'agendaWeek',
