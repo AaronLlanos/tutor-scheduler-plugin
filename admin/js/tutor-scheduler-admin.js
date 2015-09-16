@@ -76,6 +76,7 @@
 			var self = this;
 			var start, end;
 			var scheduledDates = $("#fullcalendar").fullCalendar('clientEvents');
+			var apptTimeBlocks = $("#time-to-add").val();
 			$("#fullcalendar").fullCalendar('removeEvents');
 
 			recurrUntil = moment(recurrUntil, "YYYY-MM-DD");
@@ -84,8 +85,7 @@
 				start = eventObject.start;
 				self.addNewEvent(start, i);
 				while (start.add({weeks: 1}).isBefore(recurrUntil)){
-					//Must subtract an hour because WP adds "1" to the timestamp rounding it up an hour
-					start = start.subtract({minutes: 60});
+					start = start.subtract({minutes: apptTimeBlocks});
 					self.addNewEvent(start, i);
 				}
 			});
@@ -115,7 +115,6 @@
 		        minTime: "07:00:00",
 		        maxTime: "20:00:00",
 		        timezone: "America/Chicago",
-		        weekends: false,
 		        defaultView: 'agendaWeek',
 		        dayClick: function(date, jsEvent, view) {
 		        	self.addNewEvent(date, 0);
