@@ -260,7 +260,7 @@
 					filteredTutorJSON.push(tutorToAdd);
 				});
 			}
-			_.sortBy(filteredTutorJSON, 'first_name');
+			filteredTutorJSON = _.sortBy(filteredTutorJSON, 'first_name');
 			$.each(filteredTutorJSON, function (i, tutor) {
 				optionTemplate = '<option value="' + tutor.id + '">' + tutor.first_name + ' ' + tutor.last_name + '</option>';
 				tutorsList.append(optionTemplate);
