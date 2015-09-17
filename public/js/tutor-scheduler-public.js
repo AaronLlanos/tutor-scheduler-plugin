@@ -229,8 +229,7 @@
 		loadCourseNames: function () {
 			var optionTemplate;
 			var courseList = $("#course-select");
-			var sortedCoursesJSON = coursesJSON;
-			_.sortBy(sortedCoursesJSON, 'name');
+			var sortedCoursesJSON = _.sortBy(coursesJSON, 'name');
 			courseList.append('<option value="" selected>Select a course</option>');
 			$.each(sortedCoursesJSON, function (i, course) {
 				optionTemplate = '<option value="' + course.id + '">' + course.name + '</option>';
