@@ -61,13 +61,18 @@
 		}
 	};
 
-	var FullCalendar = {
-		recurrDates: function(recurrUntil){
+	function FullCalendar(identifier, hasHeader) {
+		this.identifier = identifier;
+		this.hasHeader = hasHeader;
+		this.render = function(){
+			identifier.fullCalendar('render');
+		};
+		this.recurrDates = function(recurrUntil){
 			var self = this;
 			var start, end;
-			var scheduledDates = $("#fullcalendar").fullCalendar('clientEvents');
+			var scheduledDates = identifier.fullCalendar('clientEvents');
 			var apptTimeBlocks = $("#time-to-add").val();
-			$("#fullcalendar").fullCalendar('removeEvents');
+			identifier.fullCalendar('removeEvents');
 
 			recurrUntil = moment(recurrUntil, "YYYY-MM-DD");
 
@@ -80,25 +85,12 @@
 				}
 			});
 
-		},
-		popup: function(){
+		};
+		this.newCalendar = function () {
 			var self = this;
-			$('#fullcalendar_popover').fullCalendar({
-				editable: false,
-		        timezone: "America/Chicago",
-				dayClick: function (date, jsEvent, view) {
-					//Input the value into input.
-					$("#recurr_until").val(date.format());
-					//Close the popover
-					$("#calendar_pop").popover('hide');
-				}
-			});
-		},
-		newCalendar: function () {
-			var self = this;
-			$('#fullcalendar').fullCalendar({
+			identifier.fullCalendar({
 		        // put your options and callbacks here
-		        header: false,
+		        header: self.hasHeader,
 		        columnFormat: 'dddd',
 		        allDaySlot: false,
 		        height: "auto",
@@ -113,14 +105,13 @@
 			    	self.deleteEvent(calEvent);
 			    }
 		    });
-		},
-
-		deleteEvent: function(calEvent){
-			$("#fullcalendar").fullCalendar('removeEvents', function(event){
+		};
+		this.deleteEvent = function(calEvent){
+			identifier.fullCalendar('removeEvents', function(event){
 				return event == calEvent;
 			});
-		},
-		addNewEvent: function(customDate, id){
+		};
+		this.addNewEvent = function(customDate, id){
 
 			var tutorName = $("#first-name").val() + " " + $("#last-name").val();
 			var startTime = customDate.format();
@@ -135,7 +126,7 @@
 					end: endTime,
 					description: "Tutoring with " + tutorName
 				}
-		        $("#fullcalendar").fullCalendar('renderEvent', eventObject, true);
+		        identifier.fullCalendar('renderEvent', eventObject, true);
 			}else{
 				alert("Please enter a name before scheduling times.")
 				$("#first-name").focus();
@@ -173,7 +164,7 @@
 		serializeDates: function(){
 			var schedule = '';
 			var newCalObject = {};
-			var scheduledDates = $("#fullcalendar").fullCalendar('clientEvents');
+			var scheduledDates = identifier.fullCalendar('clientEvents');
 
 			$(scheduledDates).each(function(i, calObject){
 				newCalObject = {
@@ -195,18 +186,37 @@
 		},
 		loadBindings: function () {
 			var self = this;
+
+			var addTutorCalendar = new FullCalendar($('#add-t-fullcalendar'), false);
+			var editTutorCalendar = new FullCalendar($('#edit-t-fullcalendar'), true);
+			addTutorCalendar.newCalendar();
+			editTutorCalendar.newCalendar();
 			/**
 			 * Course Tutor Functions!
 			 */
+			$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+			 	addTutorCalendar.render();
+				editTutorCalendar.render();
+			});
 			$("#calendar_pop").popover({
 				content: '<div id="fullcalendar_popover"></div>',
 				html: true
 			});
 			$("#calendar_pop").click(function(){
-				FullCalendar.popup();
+				$('#fullcalendar_popover').fullCalendar({
+					editable: false,
+			        timezone: "America/Chicago",
+					dayClick: function (date, jsEvent, view) {
+						//Input the value into input.
+						$("#recurr_until").val(date.format());
+						//Close the popover
+						$("#calendar_pop").popover('hide');
+					}
+				});
 			});
 			$("#tutor-list-m-courses").on('change', function(){
 				var selectedTutorID = $(this).val();
+				$("#r-course-student-id").val(selectedTutorID);
 				CustomInputFilters.loadCourseNames(selectedTutorID);
 			});
 			$("#tutor-list-m-events").on('change', function(){
@@ -256,7 +266,7 @@
 				//Serialize data for POST object before submit event
 				var recurrUntil = $("#recurr_until").val();
 
-				FullCalendar.recurrDates(recurrUntil);
+				addTutorCalendar.recurrDates(recurrUntil);
 
 				if ( TutorScheduler.serializeCourses() === false ){
 					event.preventDefault();
@@ -267,16 +277,46 @@
 				this.submit();
 			});
 
-			$("#r-course-add").on('click', function(){
-				
+			$("#registered-courses").on('click', 'input.r-course-add', function(){
+				var inputValue = $(this).attr("data-courseID");
+				var addVal = false;
+				if ($(this).context.checked) {
+					//Get input format
+					$("#input-container").append(CourseManager.addCourseFormat(inputValue, addVal));
+					 console.log("Added " + inputValue);
+				}else{
+					$("input[name='"+inputValue+"']").detach();
+					console.log("Removed " + inputValue);
+				}
+			});
+			$("#not-registered-courses").on('click', 'input.r-course-remove', function(){
+				var inputValue = $(this).attr("data-courseID");
+				var addVal = true;
+				if ($(this).context.checked) {
+					//Get input format
+					$("#input-container").append(CourseManager.addCourseFormat(inputValue, addVal));
+					 console.log("Added " + inputValue);
+				}else{
+					$("input[name='"+inputValue+"']").detach();
+					console.log("Removed " + inputValue);
+				}
 			});
 
-			$("input.course-highlight-checkbox").on("click", function(event){
+			$("div").on("click", "input.course-highlight-checkbox", function(event){
 				//For the check boxes of courses when adding a tutor
 				if ($(this).context.checked) {
 					$(this).parent().parent().addClass("success");
 				}else{
 					$(this).parent().parent().removeClass("success");
+				}
+			});
+
+			$("div").on("click", "input.course-highlight-danger", function(event){
+				//For the check boxes of courses when adding a tutor
+				if ($(this).context.checked) {
+					$(this).parent().parent().addClass("danger");
+				}else{
+					$(this).parent().parent().removeClass("danger");
 				}
 			});
 
@@ -332,7 +372,7 @@
 				htmlToAppend += '<tr>';
 				htmlToAppend += '<td class="course-highlight">';
 				htmlToAppend += '<label style="display: block;">';
-				htmlToAppend += '<input class="course-highlight-checkbox r-course-add" type="checkbox" data-courseID="'+course.id+'">&nbsp; '+course.name
+				htmlToAppend += '<input class="course-highlight-danger r-course-add" type="checkbox" data-courseID="'+course.id+'">&nbsp; '+course.name
 				htmlToAppend += '</label>';
 				htmlToAppend += '</td>';
 				htmlToAppend += '</tr>';
@@ -356,8 +396,9 @@
 			filteredEventJSON = _.filter(eventJSON, function(eventObject){
 				return eventObject.tutor_ID === tutorID;
 			});
+
 			
-			console.log(filteredEventJSON);
+			console.log(maxParentID);
 			/**
 			 * Need to add a refresher for the calendar
 			 */
@@ -376,7 +417,7 @@
 		/**
 		 * Tutor Manager Functions!
 		 */
-		FullCalendar.newCalendar();
+
 		TutorScheduler.loadTutorNames();
 		TutorScheduler.loadBindings();
 
