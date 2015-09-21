@@ -24,25 +24,29 @@
 
     <!-- Main page content here. -->
     <?php echo $updateMessage; ?>
-	
+
 	<h4><?php echo "Number of Students: ". count($students); ?></h4>
 	
 	<!-- Tab List -->
 	<ul id="myTabs" class="nav nav-tabs" role="tablist">
-		<li role="presentation" class="active"><a aria-controls="add-tutor" role="tab" data-toggle="tab" href="#add-tutor">Add Tutor</a></li>
-		<li role="presentation"><a aria-controls="manage-tutor-courses" role="tab" data-toggle="tab" href="#manage-tutor-courses">Manage Tutor Courses</a></li>
-		<li role="presentation"><a aria-controls="manage-tutor" role="tab" data-toggle="tab" href="#manage-tutor">Remove Tutor(s)</a></li>
+		<li role="presentation" <?php if ($addTab){echo 'class="active"';} ?>><a aria-controls="add-tutor" role="tab" data-toggle="tab" href="#add-tutor">Add Tutor</a></li>
+		<li role="presentation" <?php if ($m_coursesTab){echo 'class="active"';} ?>><a aria-controls="manage-tutor-courses" role="tab" data-toggle="tab" href="#manage-tutor-courses">Manage Tutor Courses</a></li>
+		<li role="presentation" <?php if ($m_eventsTab){echo 'class="active"';} ?>><a aria-controls="manage-tutor-events" role="tab" data-toggle="tab" href="#manage-tutor-events">Manage Tutor Dates</a></li>
+		<li role="presentation" <?php if ($removeTab){echo 'class="active"';} ?>><a aria-controls="manage-tutor" role="tab" data-toggle="tab" href="#manage-tutor">Remove Tutor</a></li>
 	</ul>
 	<!-- Tab Content -->
 	<div class="tab-content tas-admin-card">
     	
-		<div role="tabpanel" id="add-tutor" class="tab-pane fade in active">
+		<div role="tabpanel" id="add-tutor" class="tab-pane fade <?php if ($addTab){echo 'in active';} ?>">
 			<?php require_once 'add-tutor-form.php'; ?>
 		</div>
-		<div role="tabpanel" id="manage-tutor-courses" class="tab-pane fade">
+		<div role="tabpanel" id="manage-tutor-courses" class="tab-pane fade <?php if ($m_coursesTab){echo 'in active';} ?>">
 			<?php require_once 'manage-tutor-courses.php'; ?>
 		</div>
-		<div role="tabpanel" id="manage-tutor" class="tab-pane fade">
+		<div role="tabpanel" id="manage-tutor-events" class="tab-pane fade <?php if ($m_eventsTab){echo 'in active';} ?>">
+			<?php require_once 'manage-tutor-events.php'; ?>
+		</div>
+		<div role="tabpanel" id="manage-tutor" class="tab-pane fade <?php if ($removeTab){echo 'in active';} ?>">
 			<?php require_once 'tutor-table.php'; ?>
 			<form id="student-remove-form" class="hidden" method="POST" action="<?php echo admin_url('admin.php?page=' . $this->tutor_slug . '&type=remove'); ?>"><input id="student-remove-input" name="student_id"></form>
 		</div>
