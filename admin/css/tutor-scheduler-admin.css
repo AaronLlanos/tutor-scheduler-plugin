@@ -21,9 +21,14 @@ h2 > span.dashicons.dashicons-calendar-alt{
 }
 
 .table-scroll {
-  height: 230px;
   overflow-y: auto;
 }
+	.table-scroll-small{
+  		height: 230px;
+	}
+	.table-scroll-large{
+		height: 330px;
+	}
 /**
  * Full calendar
  */

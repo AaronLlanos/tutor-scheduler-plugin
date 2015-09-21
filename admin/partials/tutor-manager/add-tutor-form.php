@@ -53,7 +53,7 @@
 			<label>Tutor Courses (<?php echo count($courses) ?>)</label>
 			<input id="courses" type="text" name="courses" class="hidden">
 			<input id="schedule" type="text" name="schedule" class="hidden">
-			<div class="table-scroll">
+			<div class="table-scroll table-scroll-small">
 				<table id="courses-table" class="table table-bordered">
 					<tbody><?php echo $this->coursesToString($courses); ?></tbody>
 				</table>
@@ -76,7 +76,7 @@
 			</select>
 		</div>
 		<br>
-		<div id='fullcalendar'></div>
+		<div id="fullcalendar"></div>
 	</div>
 	<hr>
 	<input type="submit" class="btn btn-success" value="Add Student">
