@@ -188,7 +188,7 @@
 			var self = this;
 
 			var addTutorCalendar = new FullCalendar($('#add-t-fullcalendar'), false);
-			var editTutorCalendar = new FullCalendar($('#edit-t-fullcalendar'), true);
+			var editTutorCalendar = new FullCalendar($('#edit-t-fullcalendar'), false);
 			addTutorCalendar.newCalendar();
 			editTutorCalendar.newCalendar();
 			/**
@@ -355,9 +355,8 @@
 			filteredEventJSON = _.filter(eventJSON, function(eventObject){
 				return eventObject.tutor_ID === tutorID;
 			});
-
 			
-			console.log(maxParentID);
+			console.log(filteredEventJSON);
 			/**
 			 * Need to add a refresher for the calendar
 			 */
