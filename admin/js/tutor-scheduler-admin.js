@@ -224,43 +224,6 @@
 				CustomInputFilters.updateEvents(selectedTutorID);
 			});
 
-			$("#update-tutor-courses").click(function(){
-				e.preventDefault();
-				$.ajax({
-					type: "post",
-					dataType: "json",
-					url: myAjax.ajaxurl,
-					data : {
-						action: "update_tutor_information",
-						type: 'update_courses',
-						nonce: $("#tutor-list-m-courses").attr("data-nonce"),
-						tutor_id: selectedTutorID,
-						
-					},
-					success: function(resp) {
-						if(resp.type == "success") {
-							// self.ajaxSuccess(resp.event_id);
-						}
-						else {
-							// self.ajaxError(resp);
-						}
-					},
-					error: function ( jqXHR, textStatus, errorThrown) {
-						var resp = {
-							error_type: "ajax",
-							message: textStatus,
-							type: "error",
-							event_id: -1
-						}
-						// self.ajaxError(resp);
-					},
-					complete: function ( jqXHR, textStatus ) {
-						// loadingSpinner.addClass("hidden");
-						// confirmationForm.find("input").removeAttr("disabled");
-						// $("#fullcalendar-frontend").fullCalendar('refetchEvents');
-					}
-				});
-			});
 			//Create a calendar
 			$("#student-form").submit(function(event){
 				//Serialize data for POST object before submit event
