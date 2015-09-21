@@ -29,10 +29,10 @@
 					$m_coursesTab = true;
 					break;
 				case 'm_events':
-					$m_coursesTab = true;
+					$m_eventsTab = true;
 					break;
 				case 'remove':
-					$m_coursesTab = true;
+					$removeTab = true;
 					break;
 				default:
 					$addTab = true;
@@ -95,7 +95,8 @@
 				return $this->updateCourses($studentID, 'remove') && $this->updateSchedule($studentID, 'remove');
 			}
 			else if (strcmp($type, 'm_courses') === 0) {
-				var_dump($_POST);
+				$studentID = array_pop($_POST);
+				return $this->manageCourses($studentID);
 			}
 			else if (strcmp($type, 'm_events') === 0) {
 
@@ -103,6 +104,37 @@
 			return $insertSuccess;
 		}
 
+		public function manageCourses($studentID){
+			global $wpdb;
+			//Update C2T table based on $studentID.
+			$courseSQL = false;
+			$C2TTable = $wpdb->prefix . 'tutor_scheduler_C2T';
+			$coursesTable = $this->courses_table_name;
+
+			foreach ($_POST as $courseID => $updateType) {
+				if (strcmp($updateType, 'remove') == 0) {
+					//Then delete it from the C2T table.
+					$wpdb->delete($C2TTable, array('tutor_ID' => $studentID, 'course_ID' => $courseID), array('%d', '%d'));
+					
+				}else{
+					//Add it to C2T Table
+					$wpdb->insert($C2TTable, array('tutor_ID' => $studentID, 'course_ID' => $courseID), array('%d', '%d'));
+				}
+				$tutorCountQuery = 'SELECT tutor_count FROM '. $coursesTable . ' WHERE id = ' . $courseID;
+				$tutorCount = $wpdb->get_var($tutorCountQuery);
+				if (strcmp($updateType, 'add') == 0) {
+					$tutorCount += 1;
+				}else{
+					$tutorCount -= 1;
+				}
+				$wpdb->update(
+								$coursesTable, 
+								array('tutor_count' => $tutorCount),
+								array('id' => $courseID)
+							 );
+			}
+			return true;
+		}
 		/**
 		 * Properly count how many courses in the array. This function 
 		 * takes into account that explode() may return count(array) = 1 even though an 
@@ -169,7 +201,8 @@
 		}
 
 		/**
-		 * Update courses for tutor for join table
+		 * Update courses for tutor for join table. This is called when a new tutor is added or removed.
+		 * 
 		 * @param  int|false $studentID False if student not inserted (see addStudent()). Int
 		 * @return bool            return true or false on success or failure respectively.
 		 */

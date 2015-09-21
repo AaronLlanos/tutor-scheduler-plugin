@@ -246,10 +246,8 @@
 				if ($(this).context.checked) {
 					//Get input format
 					$("#input-container").append(CourseManager.addCourseFormat(inputValue, addVal));
-					 console.log("Added " + inputValue);
 				}else{
 					$("input[name='"+inputValue+"']").detach();
-					console.log("Removed " + inputValue);
 				}
 			});
 			$("#not-registered-courses").on('click', 'input.r-course-remove', function(){
@@ -258,10 +256,8 @@
 				if ($(this).context.checked) {
 					//Get input format
 					$("#input-container").append(CourseManager.addCourseFormat(inputValue, addVal));
-					 console.log("Added " + inputValue);
 				}else{
 					$("input[name='"+inputValue+"']").detach();
-					console.log("Removed " + inputValue);
 				}
 			});
 

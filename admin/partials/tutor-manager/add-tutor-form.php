@@ -76,7 +76,7 @@
 			</select>
 		</div>
 		<br>
-		<div id="fullcalendar"></div>
+		<div id="add-t-fullcalendar"></div>
 	</div>
 	<hr>
 	<input type="submit" class="btn btn-success" value="Add Student">
