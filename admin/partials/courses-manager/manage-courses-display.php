@@ -48,19 +48,21 @@
 		</div>
 		<div class="col-xs-6 tas-admin-card">
     		<h4><?php echo "Number of Courses: ". count($courses); ?></h4>
-			<table class="table table-striped table-hover">
-				<thead> 
-					<tr>
-						<th>Course Name</th>
-						<th>Date Added</th>
-						<th>Tutor Count</th>
-						<th><span class="dashicons dashicons-trash"></span></th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php echo $this->coursesToString($courses); ?>
-				</tbody>
-			</table>
+			<div class="table-scroll table-scroll-large">
+				<table class="table table-striped table-hover">
+					<thead> 
+						<tr>
+							<th>Course Name</th>
+							<th>Date Added</th>
+							<th>Tutor Count</th>
+							<th><span class="dashicons dashicons-trash"></span></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php echo $this->coursesToString($courses); ?>
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
 
