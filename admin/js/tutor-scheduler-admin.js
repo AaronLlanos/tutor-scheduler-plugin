@@ -1,8 +1,9 @@
 (function( $ ) {
 	'use strict';
 
+	var filteredEventJSON = [];
 	var registeredCoursesJSON = [];
-	var notRegisteredcoursesJSON = [];
+	var notRegisteredCoursesJSON = [];
 	/**
 	 * Functions for adding courses to student scheduler
 	 */
@@ -27,17 +28,6 @@
 					$("#temp-course-table").prepend(CourseManager.addCourseFormat($(this).attr("data-courseID"), false));
 					$("#temp-course-table").prepend('<tr class="danger"><td>'+$(this).attr("data-name")+'</td></tr>');
 				}
-			});
-
-			/**
-			 * Course Tutor Functions!
-			 */
-			$("#calendar_pop").popover({
-				content: '<div id="fullcalendar_popover"></div>',
-				html: true
-			});
-			$("#calendar_pop").click(function(){
-				FullCalendar.popup();
 			});
 		},
 		validateCourse: function(inputValue){
@@ -156,11 +146,16 @@
 
 	var TutorScheduler = {
 
-		loadCourses: function (){
+		loadTutorNames: function (){
 			var self = this;
 			/**
 			 * Modify this function!!!
 			 */
+			$.each(tutorJSON, function(i, tutorObject){
+				var tutorOptionTemplate = '<option value="'+tutorObject.id+'">'+tutorObject.first_name+' '+tutorObject.last_name+'</option>';
+				$("#tutor-list-m-courses").append(tutorOptionTemplate);
+				$("#tutor-list-m-events").append(tutorOptionTemplate);
+			});
 			
 		},
 
@@ -200,27 +195,23 @@
 		},
 		loadBindings: function () {
 			var self = this;
-			//Manage tutor courses
+			/**
+			 * Course Tutor Functions!
+			 */
+			$("#calendar_pop").popover({
+				content: '<div id="fullcalendar_popover"></div>',
+				html: true
+			});
+			$("#calendar_pop").click(function(){
+				FullCalendar.popup();
+			});
 			$("#tutor-list-m-courses").on('change', function(){
 				var selectedTutorID = $(this).val();
-				var courseIDs = _.filter(C2TJSON, function(C2TRow){
-					return C2TRow.tutor_ID === selectedTutorID;
-				});
-				registeredCoursesJSON = [];
-				notRegisteredcoursesJSON = [];
-				$.each(courseIDs, function(i, C2TRow){
-					var coursesToAdd = _.filter(coursesJSON, function(coursesRow){
-						return C2TRow.course_ID === coursesRow.id;
-					});
-					$.merge(registeredCoursesJSON, coursesToAdd);
-				});
-				$.each(courseIDs, function(i, C2TRow){
-					notRegisteredcoursesJSON = _.filter(coursesJSON, function(coursesRow){
-						return courseIDs.course_ID === coursesRow.id;
-					});
-					$.merge(registeredCoursesJSON, coursesToAdd);
-				});
-				self.loadCourses();
+				CustomInputFilters.loadCourseNames(selectedTutorID);
+			});
+			$("#tutor-list-m-events").on('change', function(){
+				var selectedTutorID = $(this).val();
+				CustomInputFilters.updateEvents(selectedTutorID);
 			});
 
 			$("#update-tutor-courses").click(function(){
@@ -276,6 +267,10 @@
 				this.submit();
 			});
 
+			$("#r-course-add").on('click', function(){
+				
+			});
+
 			$("input.course-highlight-checkbox").on("click", function(event){
 				//For the check boxes of courses when adding a tutor
 				if ($(this).context.checked) {
@@ -298,6 +293,78 @@
 		}
 	}
 
+	//Course input functions
+	var CustomInputFilters = {
+		
+		loadCourseNames: function (tutorID) {
+			var courseToAdd = [];
+			var registeredCoursesDOM = $("#registered-courses");
+			var notRegisteredCoursesDOM = $("#not-registered-courses");
+			//Clean the DOM
+			registeredCoursesDOM.empty();
+			notRegisteredCoursesDOM.empty();
+			//Prepare the lists
+			registeredCoursesJSON = [];
+			notRegisteredCoursesJSON = coursesJSON;
+			//Get the IDs of the courses tied to the tutor ID.
+			var courseIDs = _.filter(C2TJSON, function(C2TRow){
+				return C2TRow.tutor_ID === tutorID;
+			});
+			//Filter out the courses which are registered and not registered.
+			$.each(courseIDs, function(i, C2TRow){
+				courseToAdd = _.filter(coursesJSON, function(coursesRow){
+					return C2TRow.course_ID === coursesRow.id;
+				});
+				notRegisteredCoursesJSON = _.reject(notRegisteredCoursesJSON, function(coursesRow){
+					return C2TRow.course_ID === coursesRow.id;
+				});
+				$.merge(registeredCoursesJSON, courseToAdd);
+			});
+			//Sort the filtered in ascending alphabetical order.
+			registeredCoursesJSON = _.sortBy(registeredCoursesJSON, 'name');
+			notRegisteredCoursesJSON = _.sortBy(notRegisteredCoursesJSON, 'name');
+
+			/**
+			 * Need to append these dates to the DOM.
+			 */
+			var htmlToAppend = '';
+			$.each(registeredCoursesJSON, function(i, course){
+				htmlToAppend += '<tr>';
+				htmlToAppend += '<td class="course-highlight">';
+				htmlToAppend += '<label style="display: block;">';
+				htmlToAppend += '<input class="course-highlight-checkbox r-course-add" type="checkbox" data-courseID="'+course.id+'">&nbsp; '+course.name
+				htmlToAppend += '</label>';
+				htmlToAppend += '</td>';
+				htmlToAppend += '</tr>';
+			});
+			registeredCoursesDOM.append(htmlToAppend);
+			htmlToAppend = '';
+			$.each(notRegisteredCoursesJSON, function(i, course){
+				htmlToAppend += '<tr>';
+				htmlToAppend += '<td class="course-highlight">';
+				htmlToAppend += '<label style="display: block;">';
+				htmlToAppend += '<input class="course-highlight-checkbox r-course-remove" type="checkbox" data-courseID="'+course.id+'">&nbsp; '+course.name
+				htmlToAppend += '</label>';
+				htmlToAppend += '</td>';
+				htmlToAppend += '</tr>';
+			});
+			notRegisteredCoursesDOM.append(htmlToAppend);
+		},
+		updateEvents: function (tutorID) {
+			var self = this;
+			
+			filteredEventJSON = _.filter(eventJSON, function(eventObject){
+				return eventObject.tutor_ID === tutorID;
+			});
+			
+			console.log(filteredEventJSON);
+			/**
+			 * Need to add a refresher for the calendar
+			 */
+		}
+
+	}
+
 	$( window ).load(function(){
 
 
@@ -310,6 +377,7 @@
 		 * Tutor Manager Functions!
 		 */
 		FullCalendar.newCalendar();
+		TutorScheduler.loadTutorNames();
 		TutorScheduler.loadBindings();
 
 	});
