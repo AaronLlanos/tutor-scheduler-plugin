@@ -19,6 +19,26 @@
 				wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 			}
 			
+			$type = (isset($_GET['type'])) ? $_GET['type'] : false;
+			$addTab = false;
+			$m_coursesTab = false;
+			$m_eventsTab = false;
+			$removeTab = false;
+			switch ($type) {
+				case 'm_courses':
+					$m_coursesTab = true;
+					break;
+				case 'm_events':
+					$m_coursesTab = true;
+					break;
+				case 'remove':
+					$m_coursesTab = true;
+					break;
+				default:
+					$addTab = true;
+					break;
+			}
+
 			//Run POST data
 			$updateMessage = '';
 			if (count($_POST) > 0){
@@ -33,10 +53,12 @@
 			$tutorJSON = $this->get_tutor_students();
 			$coursesJSON = $this->get_tutor_courses();
 			$C2TJSON = $this->get_C2T();
+			$eventJSON = $this->get_events();
 
 			echo 	'<script type="text/javascript">var tutorJSON = '.$tutorJSON.';
 													var coursesJSON = '.$coursesJSON.';
 													var C2TJSON = '.$C2TJSON.';
+													var eventJSON = '.$eventJSON.';
 					</script>';
 
 			require_once 'manage-students-display.php';
@@ -71,12 +93,13 @@
 				 * Should decrement course tutor count for each course this tutor was apart of. 
 				 */
 				return $this->updateCourses($studentID, 'remove') && $this->updateSchedule($studentID, 'remove');
-				/**
-				 * Should remove all events tied to this tutor
-				 */
-				;
 			}
+			else if (strcmp($type, 'm_courses') === 0) {
+				var_dump($_POST);
+			}
+			else if (strcmp($type, 'm_events') === 0) {
 
+			}
 			return $insertSuccess;
 		}
 
@@ -312,6 +335,20 @@
 			$tutors = $wpdb->get_results($query);
 
 			return json_encode($tutors);
+		}
+
+		public function get_events($eventID = -1) {
+			global $wpdb;
+			
+			$query = "
+					SELECT *
+					FROM " . $this->events_table_name . "
+					";
+			
+
+			$events = $wpdb->get_results($query);
+
+			return json_encode($events);
 		}
 	}
  ?>
