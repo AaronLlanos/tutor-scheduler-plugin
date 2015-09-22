@@ -329,6 +329,7 @@ class Tutor_Scheduler_Public {
 					var tutorsJSON = ' . $tutors . ';
 					var C2TJSON = ' . $C2T . ';
 					var eventJSON = ' . $events . ';
+					var remoteIPAddress = "' . $_SERVER['REMOTE_ADDR'] . '";
 				</script>';
 
 		if (!require_once 'partials/tutor-appointment-scheduler-display.php') {

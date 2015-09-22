@@ -139,6 +139,28 @@
 				alert(resp.message);
 			}
 		},
+		recaptchaAjaxForm: function(){
+			var recaptchaSecret = '';
+			var recaptchaURL = 'https://www.google.com/recaptcha/api/siteverify';
+			$.ajax({
+				url: recaptchaURL,
+				type: "post",
+				dataType: "jsonp",
+				data: {
+					remoteip: remoteIPAddress,
+					secret: recaptchaSecret,
+					response: $("#g-recaptcha-response").val()
+				},
+				success: function(resp){
+					console.log(resp);
+				},
+				error: function ( jqXHR, textStatus, errorThrown) {
+					console.log(jqXHR);
+					console.log(textStatus);
+					console.log(errorThrown);
+				},
+			});
+		},
 		submitAjaxForm: function () {
 			// body...
 			var self = this;
@@ -196,6 +218,7 @@
 			});
 		},
 		refreshModal: function () {
+			$("input").val('');
 			$(".modal-success").removeClass("bg-success");
 			$(".modal-success").removeClass("bg-danger");
 			$(".before-ajax-request").removeClass("hidden");
@@ -220,6 +243,9 @@
 			$("#tutor-select").on('change', function(){
 				var selectedTutorID = $(this).val();
 				FullCalendarFrontEnd.updateEvents(selectedTutorID);
+			});
+			$(".g-recaptcha").on('click', function (argument){
+				self.recaptchaAjaxForm();
 			});
 			$("#confirm-appointment").submit(function(e){
 				e.preventDefault();

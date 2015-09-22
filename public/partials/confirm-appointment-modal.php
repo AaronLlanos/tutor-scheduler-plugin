@@ -74,8 +74,9 @@
 				<div class="col-xs-6">
 					<div class="form-group">
 						<label for="note-to-tutor">Leave a Note for <span class="selected-tutor-name"></span>:</label>
-						<textarea id="note-to-tutor" style="height: 225px;" class="form-control"></textarea>
+						<textarea id="note-to-tutor" style="height: 190px;" class="form-control"></textarea>
 					</div>
+					<div class="g-recaptcha" data-sitekey="6LfCTQ0TAAAAAOfEfKTALxNDwVG-ExaPdHZc-_wM"></div>
 				</div>
 			</div>
 		</span>
@@ -104,7 +105,7 @@
 					<p>What to do now?</p> 
 					<ul>
 						<li>Wait for the confirmation email</li>
-						<li>Save the event to your calendar via the button bellow!</li>
+						<li>Save the event to your calendar via the button below!</li>
 					</ul>
 					<div id="addthisevent" class="addthisevent">
 					    <span id="start" class="start"></span>
