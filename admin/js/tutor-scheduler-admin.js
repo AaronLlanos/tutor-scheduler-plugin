@@ -67,6 +67,29 @@
 		this.render = function(){
 			identifier.fullCalendar('render');
 		};
+
+		this.serializeDates = function(){
+			var schedule = '';
+			var newCalObject = {};
+			var scheduledDates = this.identifier.fullCalendar('clientEvents');
+
+			$.each(scheduledDates, function(i, calObject){
+				newCalObject = {
+									start: calObject.start,
+									end: calObject.end,
+									title: calObject.title,
+									id: calObject.id,
+									description: calObject.description
+								};
+				schedule += JSON.stringify(newCalObject)+", ";
+			});
+
+			$("input#schedule").val(schedule);
+			$("input#schedule").attr("size", schedule.length);
+			
+			return true;
+
+		};
 		this.recurrDates = function(recurrUntil){
 			var self = this;
 			var start, end;
@@ -161,29 +184,6 @@
 
 			return true;
 		},
-		serializeDates: function(){
-			var schedule = '';
-			var newCalObject = {};
-			var scheduledDates = identifier.fullCalendar('clientEvents');
-
-			$(scheduledDates).each(function(i, calObject){
-				newCalObject = {
-									start: calObject.start,
-									end: calObject.end,
-									title: calObject.title,
-									id: calObject.id,
-									description: calObject.description
-								};
-				schedule += JSON.stringify(newCalObject)+", ";
-
-			});
-
-			$("input#schedule").val(schedule);
-			$("input#schedule").attr("size", schedule.length);
-			
-			return true;
-
-		},
 		loadBindings: function () {
 			var self = this;
 
@@ -234,7 +234,7 @@
 				if ( TutorScheduler.serializeCourses() === false ){
 					event.preventDefault();
 				}
-				if ( TutorScheduler.serializeDates() === false ){
+				if ( addTutorCalendar.serializeDates() === false ){
 					event.preventDefault();
 				}
 				this.submit();
