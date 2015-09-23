@@ -15,6 +15,15 @@
 
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
 
+<div class="alert alert-info">
+	<h4>Please Read this Thouroughly Before Proceeding!</h4>
+	Welcome to our beta tutor scheduler. Here at LCAE we are striving to make our student experience as efficient as possible.
+	<ul>
+		<li><b>Booking for STEM subjects: </b>This scheduler is currently being refined over the next few days. To book an appointment please refer to the "Original" youcanbookme system by scrolling down. Thank you.</li>
+		<li><b>Booking non-STEM subjects: </b>Please feel free to use this calendar to refine your search.</li>
+	</ul>
+</div>
+
 <div class="row">
 	<div class="col-sm-6">
 		<label for="course-select">Select a Course</label>
