@@ -140,7 +140,7 @@
 			}
 		},
 		recaptchaAjaxForm: function(){
-			var recaptchaSecret = '';
+			var recaptchaSecret = '6LfCTQ0TAAAAADPjuc5P6nBzjdWnTEbIxsZZrxqU';
 			var recaptchaURL = 'https://www.google.com/recaptcha/api/siteverify';
 			$.ajax({
 				url: recaptchaURL,
