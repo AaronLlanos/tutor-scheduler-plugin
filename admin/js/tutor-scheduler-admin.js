@@ -9,9 +9,16 @@
 (function( $ ) {
 	'use strict';
 
-	var filteredEventJSON = [];
-	var registeredCoursesJSON = [];
-	var notRegisteredCoursesJSON = [];
+	var filteredTutorEvents = {
+		eventsJSON: [],
+		parentEventsJSON: [],
+		largestParentID: -1,
+		recurrUntil: {}
+	};
+	var filteredTutorCourses = {
+		registered: [],
+		notRegistered: []
+	};
 	/**
 	 * Functions for adding courses to student scheduler
 	 */
@@ -105,14 +112,13 @@
 			var apptTimeBlocks = $("#time-to-add").val();
 			identifier.fullCalendar('removeEvents');
 
-			recurrUntil = moment(recurrUntil, "YYYY-MM-DD");
+			recurrUntil = moment(recurrUntil, "YYYY-MM-DD").add({day: 1});
 
 			$.each(scheduledDates, function(i, eventObject){
 				start = eventObject.start;
-				self.addNewEvent(start, i);
-				while (start.add({weeks: 1}).isBefore(recurrUntil)){
-					start = start.subtract({minutes: apptTimeBlocks});
+				while (start.isBefore(recurrUntil)){
 					self.addNewEvent(start, i);
+					start = start.subtract({minutes: apptTimeBlocks}).add({weeks: 1});
 				}
 			});
 
@@ -235,6 +241,9 @@
 			});
 			$("#tutor-list-m-events").on('change', function(){
 				var selectedTutorID = $(this).val();
+				var name = $("#tutor-list-m-events option:selected").text().split();
+				$("#first-name").val(name[0]);
+				$("#last-name").val(name[1]);
 				CustomInputFilters.updateEvents(selectedTutorID);
 				if (filteredTutorEvents.eventJSON.length < 1) {
 					//Set modal title, body.
@@ -343,8 +352,8 @@
 			registeredCoursesDOM.empty();
 			notRegisteredCoursesDOM.empty();
 			//Prepare the lists
-			registeredCoursesJSON = [];
-			notRegisteredCoursesJSON = coursesJSON;
+			filteredTutorCourses.registered = [];
+			filteredTutorCourses.notRegistered = coursesJSON;
 			//Get the IDs of the courses tied to the tutor ID.
 			var courseIDs = _.filter(C2TJSON, function(C2TRow){
 				return C2TRow.tutor_ID === tutorID;
@@ -354,20 +363,20 @@
 				courseToAdd = _.filter(coursesJSON, function(coursesRow){
 					return C2TRow.course_ID === coursesRow.id;
 				});
-				notRegisteredCoursesJSON = _.reject(notRegisteredCoursesJSON, function(coursesRow){
+				filteredTutorCourses.notRegistered = _.reject(filteredTutorCourses.notRegistered, function(coursesRow){
 					return C2TRow.course_ID === coursesRow.id;
 				});
-				$.merge(registeredCoursesJSON, courseToAdd);
+				$.merge(filteredTutorCourses.registered, courseToAdd);
 			});
 			//Sort the filtered in ascending alphabetical order.
-			registeredCoursesJSON = _.sortBy(registeredCoursesJSON, 'name');
-			notRegisteredCoursesJSON = _.sortBy(notRegisteredCoursesJSON, 'name');
+			filteredTutorCourses.registered = _.sortBy(filteredTutorCourses.registered, 'name');
+			filteredTutorCourses.notRegistered = _.sortBy(filteredTutorCourses.notRegistered, 'name');
 
 			/**
 			 * Need to append these dates to the DOM.
 			 */
 			var htmlToAppend = '';
-			$.each(registeredCoursesJSON, function(i, course){
+			$.each(filteredTutorCourses.registered, function(i, course){
 				htmlToAppend += '<tr>';
 				htmlToAppend += '<td class="course-highlight">';
 				htmlToAppend += '<label style="display: block;">';
@@ -378,7 +387,7 @@
 			});
 			registeredCoursesDOM.append(htmlToAppend);
 			htmlToAppend = '';
-			$.each(notRegisteredCoursesJSON, function(i, course){
+			$.each(filteredTutorCourses.notRegistered, function(i, course){
 				htmlToAppend += '<tr>';
 				htmlToAppend += '<td class="course-highlight">';
 				htmlToAppend += '<label style="display: block;">';
@@ -391,12 +400,29 @@
 		},
 		updateEvents: function (tutorID) {
 			var self = this;
-			
-			filteredEventJSON = _.filter(eventJSON, function(eventObject){
-				return eventObject.tutor_ID === tutorID;
+			var largestParentID = -1;
+			var yesterday = moment().subtract({day: 1});
+			var recurrUntil = moment().add({day: 1});
+			filteredTutorEvents.parentEventJSON = []; // Clear the JSON array so that it is now clean.
+			filteredTutorEvents.eventJSON = _.filter(eventJSON, function(eventObject){
+				if(eventObject.tutor_ID === tutorID){
+					largestParentID = Math.max(eventObject.parent_ID, largestParentID);
+					if (yesterday.isBefore(eventObject.start)){
+						recurrUntil = moment(eventObject.start);
+					}
+				}
+				return eventObject.tutor_ID === tutorID && yesterday.isBefore(eventObject.start);
 			});
-			
-			console.log(filteredEventJSON);
+			for (var i = largestParentID; i >= 0; i--) {
+				var parentToPush = _.find(filteredTutorEvents.eventJSON, function(eventObject){
+					//Parent ID is a String and i is a number.
+					// This comes as a string from the DB.
+					return eventObject.parent_ID == i; 	
+				});
+				filteredTutorEvents.parentEventJSON.push(parentToPush);
+			};
+			filteredTutorEvents.largestParentID = largestParentID;
+			filteredTutorEvents.recurrUntil = recurrUntil.format("YYYY-MM-DD");
 			/**
 			 * Need to add a refresher for the calendar
 			 */
