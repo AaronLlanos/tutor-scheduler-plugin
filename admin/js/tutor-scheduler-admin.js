@@ -1,3 +1,11 @@
+/**
+ * Tutor Scheduler Admin Javascript
+ *
+ *
+ * Purpose: This file controls all of the Javascript for the Course Manager and Tutor Manager Pages.
+ * 
+ */
+
 (function( $ ) {
 	'use strict';
 
@@ -194,9 +202,15 @@
 			/**
 			 * Course Tutor Functions!
 			 */
+			$('.modal-body').on('change', '#edit-t-time-to-add', function(){
+				var timeToAdd = $(this).val();
+				$("#time-to-add").val(timeToAdd);
+			});
 			$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 			 	addTutorCalendar.render();
 				editTutorCalendar.render();
+				$("#first-name").val('');
+				$("#last-name").val('');
 			});
 			$("#calendar_pop").popover({
 				content: '<div id="fullcalendar_popover"></div>',
@@ -222,10 +236,36 @@
 			$("#tutor-list-m-events").on('change', function(){
 				var selectedTutorID = $(this).val();
 				CustomInputFilters.updateEvents(selectedTutorID);
+				if (filteredTutorEvents.eventJSON.length < 1) {
+					//Set modal title, body.
+					$(".modal .modal-title").html("Please Enter a Time Block");
+					$(".modal .modal-body").html('<select name="time-to-add" id="edit-t-time-to-add" class="form-control" form="student-form" required><option selected>Tutoring Time Block</option><option value="30">30 minutes</option><option value="60">60 minutes</option></select>');
+					//Pop up the modal. 
+					$('.modal').modal('toggle')
+				}else{
+					var endTime = filteredTutorEvents.eventJSON[0].end;
+					var startTime = filteredTutorEvents.eventJSON[0].start;
+					var timeBlock =  moment(endTime).diff(startTime, 'minutes');
+				}
 			});
 
 			//Create a calendar
-			$("#student-form").submit(function(event){
+			$("#add-student-form").submit(function(event){
+				//Serialize data for POST object before submit event
+				var recurrUntil = $("#recurr_until").val();
+
+				addTutorCalendar.recurrDates(recurrUntil);
+
+				if ( TutorScheduler.serializeCourses() === false ){
+					event.preventDefault();
+				}
+				if ( addTutorCalendar.serializeDates() === false ){
+					event.preventDefault();
+				}
+				this.submit();
+			});
+
+			$("#edit-student-form").submit(function(event){
 				//Serialize data for POST object before submit event
 				var recurrUntil = $("#recurr_until").val();
 
@@ -360,6 +400,7 @@
 			/**
 			 * Need to add a refresher for the calendar
 			 */
+			console.log(filteredTutorEvents.recurrUntil);
 		}
 
 	}
@@ -375,7 +416,6 @@
 		/**
 		 * Tutor Manager Functions!
 		 */
-
 		TutorScheduler.loadTutorNames();
 		TutorScheduler.loadBindings();
 

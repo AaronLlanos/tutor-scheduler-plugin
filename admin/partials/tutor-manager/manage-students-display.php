@@ -51,7 +51,18 @@
 			<form id="student-remove-form" class="hidden" method="POST" action="<?php echo admin_url('admin.php?page=' . $this->tutor_slug . '&type=remove'); ?>"><input id="student-remove-input" name="student_id"></form>
 		</div>
 	</div>
-
-
+	<div class="modal fade bs-example-modal-sm" tabindex="1000" role="dialog" style="width: 500px !important; margin-left: 200px !important; margin-top: 200px !important">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title"></h4>
+				</div>
+				<div class="modal-body"></div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-success" data-dismiss="modal">Okay</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
 
 </div><!-- /.wrap -->
