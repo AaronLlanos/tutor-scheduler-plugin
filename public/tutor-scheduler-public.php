@@ -155,6 +155,13 @@ class Tutor_Scheduler_Public {
 
 		// Message
 		require_once 'partials/email-controller.php';
+		$pos = strrpos($_SERVER["HTTP_REFERER"], "?");
+		$cancelationAddress = '';
+		if ($pos === false) {
+			$cancelationAddress = $_SERVER["HTTP_REFERER"]."?action=cancel&booked_ID=".$bookedID;
+		}else{
+			$cancelationAddress = $_SERVER["HTTP_REFERER"]."&action=cancel&booked_ID=".$bookedID;
+		}
 		$message = Email_Controller::getSuccessMessage(
 							$eventDate,
 							$tutorSubject,
@@ -163,8 +170,7 @@ class Tutor_Scheduler_Public {
 							$tuteeName,
 							$tuteeEmail,
 							$noteToTutor,
-							$_SERVER["HTTP_REFERER"],
-							$bookedID
+							$cancelationAddress
 						);
 
 		// To send HTML mail, the Content-type header must be set

@@ -668,7 +668,7 @@ class Email_Controller
 		</body></html>';
 	}
 
-	public static function getSuccessMessage($eventDate, $tutorSubject, $tutorName, $tutorEmail, $tuteeName, $tuteeEmail, $noteToTutor, $plugin_location, $bookedID) {
+	public static function getSuccessMessage($eventDate, $tutorSubject, $tutorName, $tutorEmail, $tuteeName, $tuteeEmail, $noteToTutor, $plugin_location) {
 		return '
 		<html xmlns="http://www.w3.org/1999/xhtml"><head>
 		    	<!-- NAME: 1 COLUMN -->
@@ -1309,7 +1309,7 @@ class Email_Controller
 		                        
 		                            <h3 style="line-height: 20.7999992370605px; text-align: center;">This email is automated. Please do not reply directly to this email.</h3>
 		<br>
-		<em>If you need to cancel your appointment, you can do so by clicking <a href="'.$plugin_location.'&action=cancel&booked_ID='.$bookedID.'">this link.</a><br>
+		<em>If you need to cancel your appointment, you can do so by clicking <a href="'.$plugin_location.'">this link.</a><br>
 		<br>
 		The Longhorn Center for Academic Excellence</em>
 		                        </td>
