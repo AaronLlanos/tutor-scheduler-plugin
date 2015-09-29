@@ -124,7 +124,7 @@
 		</span>
 	</div>
 	<div class="modal-footer modal-success">
-		<button class="btn btn-success before-ajax-request" type="submit">Confirm <img src="/wp-includes/js/tinymce/skins/lightgray/img/loader.gif" class="loading-spinner hidden"></button>
+		<button class="btn btn-success before-ajax-request" type="submit">Confirm <img src="<?php echo plugins_url( 'images/loader.gif', __DIR__ ); ?>" class="loading-spinner hidden"></button>
 		<button class="btn btn-danger before-ajax-request" type="button" data-dismiss="modal" aria-label="Close">Cancel</button>
 		<button class="btn btn-info after-ajax-success after-ajax-race-error hidden" type="button" data-dismiss="modal" aria-label="Close">Close</button>
 		
