@@ -27,7 +27,7 @@ class Tutor_Scheduler_Activator {
 		global $tsp_db_version;
 		// $wpdb->show_errors( true );
 
-		$tsp_db_version = '1.0';
+		$tsp_db_version = '1.1';
 
 		$courses_table_name = $wpdb->prefix . 'tutor_scheduler_courses';
 		$tutors_table_name = $wpdb->prefix . 'tutor_scheduler_tutors';
@@ -95,6 +95,17 @@ class Tutor_Scheduler_Activator {
 
  		// echo $wpdb->last_error;
  		// echo $wpdb->last_error;
+ 		/**
+ 		 * This will add or remove any columns from tables.
+ 		 */
+ 		$hasCanceled = $wpdb->get_row("SELECT * FROM ".$booked_events_table_name);
+		//Add column if not present.
+		if(!isset($hasCanceled->canceled)){
+		    $addQuery = 'ALTER TABLE '.$booked_events_table_name.
+ 					' ADD canceled tinyint(4) DEFAULT 0 NOT NULL';
+ 			$wpdb->query($addQuery);
+		}
+ 		
 
 		add_option( 'tsp_db_version', $tsp_db_version );
 
