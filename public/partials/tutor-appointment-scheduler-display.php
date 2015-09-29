@@ -14,7 +14,23 @@
 ?>
 
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
-
+<?php 
+if(isset($canceledAppointmentResponse['success']) && $canceledAppointmentResponse['success'] === true){
+?>
+<div class="alert alert-success fade in">
+	<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+	<?php echo $canceledAppointmentResponse['message']; ?>
+</div>
+<?php
+}else if(isset($canceledAppointmentResponse['success']) && $canceledAppointmentResponse['success'] === false){
+ ?>
+<div class="alert alert-danger fade in">
+	<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+	<?php echo $canceledAppointmentResponse['message']; ?>
+</div>
+ <?php 
+}
+  ?>
 <div class="alert alert-info">
 	<h4>Please Read this Thouroughly Before Proceeding!</h4>
 	Welcome to our beta tutor scheduler. Here at LCAE we are striving to make our student experience as efficient as possible.

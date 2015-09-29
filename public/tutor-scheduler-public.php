@@ -134,7 +134,7 @@ class Tutor_Scheduler_Public {
 
 	}
 
-	public function send_confirmation_email($tutor_ID) {
+	public function send_confirmation_email($tutor_ID, $bookedID) {
 
 		$tutor = json_decode($this->get_tutors($tutor_ID));
 
@@ -146,23 +146,25 @@ class Tutor_Scheduler_Public {
 		$to .= $tutorEmail;
 
 		// subject
-		$subject = 'LCAE - Tutor Appointment Confirmation';
+		$subject = 'LCAE - Tutor Appointment Booking Confirmation';
 
 		$tutorName = $tutor[0]->{"first_name"}.' '.$tutor[0]->{"last_name"};
 		$tuteeName = $_POST["first_name"].' '.$_POST["last_name"];
 		$tuteeEmail = $_POST["email"];
 		$noteToTutor = $_POST["note_to_tutor"];
 
-		// message
+		// Message
 		require_once 'partials/email-controller.php';
-		$message = Email_Controller::getMessage(
+		$message = Email_Controller::getSuccessMessage(
 							$eventDate,
 							$tutorSubject,
 							$tutorName,
 							$tutorEmail,
 							$tuteeName,
 							$tuteeEmail,
-							$noteToTutor
+							$noteToTutor,
+							$_SERVER["HTTP_REFERER"],
+							$bookedID
 						);
 
 		// To send HTML mail, the Content-type header must be set
@@ -179,45 +181,142 @@ class Tutor_Scheduler_Public {
 		mail($to, $subject, $message, $headers);
 	}
 
+	public function cancel_appointment($bookedID){
+		global $wpdb;
+
+		$response['success'] = true;
+		// Get the information from the tables
+		$bookedAppointmentSQL = 'SELECT * FROM '.$this->booked_events_table_name.' WHERE id = '.$bookedID;
+		$booked_data_format = array('%d', '%d', '%s', '%s', '%s', '%s', '%d');
+		$bookedAppointmentObject = $wpdb->get_row($bookedAppointmentSQL);
+		$tutorInformationSQL = 'SELECT first_name, last_name, email FROM '.$this->tutor_table_name.' WHERE id = '.$bookedAppointmentObject->tutor_ID;
+		$tutorObject = $wpdb->get_row($tutorInformationSQL);
+		// If it is already cancelled, no need to resend the email.
+		if ($bookedAppointmentObject->canceled == 0){
+			if(!$wpdb->update($this->events_table_name, array('date_taken' => 0), array('id' => $bookedAppointmentObject->event_ID))
+					|| !$wpdb->update($this->booked_events_table_name, array('canceled' => 1), array('id' => $bookedID))){
+				$response['success'] = false;
+				$response['message'] = 'Unable to connect to database. Please try again.';
+			}
+			$response['message'] = 'Successfully cancelled appointment #'.$bookedAppointmentObject->id.'. A confirmation email will be sent shortly.'; 
+			// Send out the email!
+			$to  = $bookedAppointmentObject->tutee_email . ', '; // note the comma
+			$to .= $tutorObject->email;
+			$subject = 'LCAE - Tutor Appointment Cancellation Confirmation';
+			require_once 'partials/email-controller.php';
+			$message = Email_Controller::getCancellationMessage(
+								$bookedAppointmentObject->start,
+								$bookedAppointmentObject->tutee_first_name,
+								$bookedAppointmentObject->tutee_last_name,
+								$bookedAppointmentObject->tutee_email,
+								$tutorObject->first_name,
+								$tutorObject->last_name,
+								$tutorObject->email
+							);
+			// To send HTML mail, the Content-type header must be set
+			$headers  = 'MIME-Version: 1.0' . "\r\n";
+			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+
+			// Additional headers
+			$headers .= 'From: LCAE <lcae@austin.utexas.edu>'."\r\n";
+			// $headers .= 'Cc: birthdayarchive@example.com'."\r\n";
+			// $headers .= 'Bcc: birthdaycheck@example.com' . "\r\n";
+
+			// Mail it
+			mail($to, $subject, $message, $headers);
+		}
+		$response['message'] = 'This appointment has already been cancelled. Thank you for trying again.';
+		return $response;
+	}
+
 	public function confirm_tas_appointment() {
 		global $wpdb;
 
 		if ( !wp_verify_nonce( $_REQUEST['nonce'], "confirm_tas_appointment")) {
 			exit("No naughty business please");
 		}
+		//Verify recapcha
+		$rData = array(
+			'secret' => '6LfCTQ0TAAAAADPjuc5P6nBzjdWnTEbIxsZZrxqU',
+			'response' => $_REQUEST['recaptcha_response'],
+			'remoteip' => $_SERVER['REMOTE_ADDR']
+		);
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+				CURLOPT_RETURNTRANSFER => 1,
+				CURLOPT_URL => 'https://www.google.com/recaptcha/api/siteverify',
+				CURLOPT_POST => 1,
+				CURLOPT_POSTFIELDS => $rData
+		));
+		$recaptchaResponse = curl_exec($curl);
+		curl_close($curl);
 
-		//Update the date_taken flag on this specific appointment
-		$sql = 'SELECT date_taken, start FROM '.$this->events_table_name.' WHERE id = '.$_POST["event_id"];
-		$eventObjectToUpdate = $wpdb->get_row($sql);
-		//Check to make sure the flag is still 0 ex: RACE CONDITIONS!
-		if ($eventObjectToUpdate->date_taken != 0) {
+		if($recaptchaResponse == false){
 			$result["type"] = "error";
-			$result["error_type"] = "race";
-			$result["message"] = "This appointment appears to have already been booked. Updating calendar now...";
-		}
-		else if (!$wpdb->update($this->events_table_name, array('date_taken' => 1), array('id' => $_REQUEST["event_id"]) )) {
-			$result["type"] = "error";
-			$result["error_type"] = "db";
-			$result["message"] = "Could not connect to the database. Please try again later.";
-
+			$result["error_type"] = "recaptcha";
+			$result["message"] = "Apparently Google's recaptcha thinks you are a robot. Please try again.";
+		}else if(gettype($recaptchaResponse) == "object" && isset($recaptchaResponse->success)){
+			if($recaptchaResponse->success == false){
+				$result["type"] = "error";
+				$result["error_type"] = "recaptcha";
+				/**
+				 * missing-input-secret		The secret parameter is missing.
+				 * invalid-input-secret		The secret parameter is invalid or malformed.
+				 * missing-input-response	The response parameter is missing.
+				 * invalid-input-response	The response parameter is invalid or malformed.
+				 */
+				// $result["message"] = gettype($recaptchaResponse->success);
+				switch ($recaptchaResponse->{'error-codes'}) {
+					case 'missing-input-secret':
+						$result["message"] = 'The secret parameter is missing.'; break;
+					case 'invalid-input-secret':
+						$result["message"] = 'The secret parameter is invalid or malformed.'; break;
+					case 'missing-input-response':
+						$result["message"] = 'The response parameter is missing.'; break;
+					case 'invalid-input-response':
+						$result["message"] = 'The response parameter is invalid or malformed.'; break;
+					default:
+						$result["message"] = 'Whatever.'; break;
+				}
+			}else if($recaptchaResponse->success == true){
+				//Update the date_taken flag on this specific appointment
+				$eventSql = 'SELECT date_taken, start FROM '.$this->events_table_name.' WHERE id = '.$_POST["event_id"];
+				$eventObjectToUpdate = $wpdb->get_row($eventSql);
+				//Check to make sure the flag is still 0 ex: RACE CONDITIONS!
+				if ($eventObjectToUpdate->date_taken != 0) {
+					$result["type"] = "error";
+					$result["error_type"] = "race";
+					$result["message"] = "This appointment appears to have already been booked. Updating calendar now...";
+				}
+				else if (!$wpdb->update($this->events_table_name, array('date_taken' => 1), array('id' => $_REQUEST["event_id"]) )) {
+					$result["type"] = "error";
+					$result["error_type"] = "db";
+					$result["message"] = "Could not connect to the database. Please try again later.";
+				}else{
+					$result["type"] = "success";
+					//Save to booked events
+					$booked_data = array(
+											'event_ID' => $_POST["event_id"],
+											'tutor_ID' => $_REQUEST["tutor_id"],
+											'start' => $eventObjectToUpdate->start,
+											'tutee_first_name' => $_POST["first_name"],
+											'tutee_last_name' => $_POST["last_name"],
+											'tutee_email' => $_POST["email"],
+											'canceled' => 0
+										);
+					$booked_data_format = array('%d', '%d', '%s', '%s', '%s', '%s', '%d');
+					if ($wpdb->insert($this->booked_events_table_name, $booked_data, $booked_data_format)){
+						//Send a confirmation email to student
+						$this->send_confirmation_email($_REQUEST["tutor_id"], $wpdb->insert_id);
+					}
+				}
+			}
 		}else{
-			$result["type"] = "success";
-			//Send a confirmation email to student
-			$this->send_confirmation_email($_REQUEST["tutor_id"]);	
-			//Save to booked events
-			$booked_data = array(
-									'event_ID' => $_POST["event_id"],
-									'tutor_ID' => $_REQUEST["tutor_id"],
-									'start' => $eventObjectToUpdate->start,
-									'tutee_first_name' => $_POST["first_name"],
-									'tutee_last_name' => $_POST["last_name"],
-									'tutee_email' => $_POST["email"]
-								);
-			$booked_data_format = array('%d', '%d', '%s', '%s', '%s', '%s');
-			$wpdb->insert($this->booked_events_table_name, $booked_data, $booked_data_format);
+			$result["type"] = "error";
+			$result["error_type"] = "recaptcha";
+			$result["message"] = 'Man, something went wrong with recaptcha. I really dont know what to say.';
 		}
 
-		$result["event_id"] = $_REQUEST["event_id"];
 
 		if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
 			$result = json_encode($result);
@@ -318,23 +417,28 @@ class Tutor_Scheduler_Public {
 	 * Hook that will load the shortcode which loads the front-end of the site
 	 */
 	public function run( $atts ) {
-
+		// Boolean
+		$cancelAppointment = (isset($_GET['action']) ? $_GET['action'] : false);
+		$canceledAppointmentResponse = false;
+		$bookedID = (isset($_GET['booked_ID']) ? $_GET['booked_ID'] : false);
+		if (strcmp($cancelAppointment, 'cancel') === 0 && $bookedID != false){
+			$canceledAppointmentResponse = $this->cancel_appointment($bookedID);
+		}
 		$courses = $this->get_courses();		
 		$tutors = $this->get_tutors();		
 		$C2T = $this->get_C2T();		
 		$events = $this->get_events();
-
 		echo 	'<script type="text/javascript">
 					var coursesJSON = ' . $courses . ';
 					var tutorsJSON = ' . $tutors . ';
 					var C2TJSON = ' . $C2T . ';
 					var eventJSON = ' . $events . ';
-					var remoteIPAddress = "' . $_SERVER['REMOTE_ADDR'] . '";
 				</script>';
 
 		if (!require_once 'partials/tutor-appointment-scheduler-display.php') {
 			return 'Error failed to load the Calendar';
-		}		
+		}
+
 	}
 
 }

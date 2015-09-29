@@ -68,6 +68,7 @@ class Tutor_Scheduler_Activator {
 			tutee_first_name tinytext NOT NULL,
 			tutee_last_name tinytext NOT NULL,
 			tutee_email  tinytext NOT NULL,
+			canceled  tinyint NOT NULL,
 			PRIMARY KEY  id (id)
 		); $charset_collate";
 		dbDelta( $booked_event_sql );

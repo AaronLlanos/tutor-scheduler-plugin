@@ -10,8 +10,8 @@
 	'use strict';
 
 	var filteredTutorEvents = {
-		eventsJSON: [],
-		parentEventsJSON: [],
+		eventsJSON: [], 
+		parentEventJSON: [],
 		largestParentID: -1,
 		recurrUntil: {}
 	};
@@ -140,7 +140,14 @@
 			    },
 			    eventClick: function(calEvent, jsEvent, view) {
 			    	self.deleteEvent(calEvent);
-			    }
+			    },
+			    events: function(start, end, timezone, callback){
+					if (editSingleEvent) {
+						callback(filteredTutorEvents.eventsJSON);
+					}else{
+						callback(filteredTutorEvents.parentEventJSON);
+					}
+				}
 		    });
 		};
 		this.deleteEvent = function(calEvent){

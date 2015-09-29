@@ -123,7 +123,7 @@
 			 * Response types are as follows:
 			 * resp.type = ["db", "ajax", "race"];
 			 */
-			// console.log(resp.error_type);
+			console.log(resp);
 			$(".modal-success").addClass("bg-danger");
 			if (resp.error_type === "race") {
 				$(".before-ajax-request").addClass("hidden");
@@ -135,31 +135,12 @@
 				filteredEventJSON = _.reject(filteredEventJSON, function(eventObject){
 					return eventObject.id === resp.event_id;
 				});
+			}else if(resp.error_type === "recaptcha"){
+				grecaptcha.reset();
+				alert(resp.message);
 			}else{
 				alert(resp.message);
 			}
-		},
-		recaptchaAjaxForm: function(){
-			var recaptchaSecret = '6LfCTQ0TAAAAADPjuc5P6nBzjdWnTEbIxsZZrxqU';
-			var recaptchaURL = 'https://www.google.com/recaptcha/api/siteverify';
-			$.ajax({
-				url: recaptchaURL,
-				type: "post",
-				dataType: "jsonp",
-				data: {
-					remoteip: remoteIPAddress,
-					secret: recaptchaSecret,
-					response: $("#g-recaptcha-response").val()
-				},
-				success: function(resp){
-					console.log(resp);
-				},
-				error: function ( jqXHR, textStatus, errorThrown) {
-					console.log(jqXHR);
-					console.log(textStatus);
-					console.log(errorThrown);
-				},
-			});
 		},
 		submitAjaxForm: function () {
 			// body...
@@ -174,6 +155,7 @@
 				dataType: "json",
 				url: myAjax.ajaxurl,
 				data : {
+					recaptcha_response: 'g-recaptcha-response',
 					action: "confirm_tas_appointment",
 					event_id: confirmationForm.attr("data-eventID"),
 					nonce: confirmationForm.attr("data-nonce"),
@@ -190,7 +172,7 @@
 					program: $("#program").val()
 				},
 				success: function(resp) {
-					// console.log("Success!");
+					console.log("Success!");
 					if(resp.type == "success") {
 						self.ajaxSuccess(resp.event_id);
 					}
@@ -199,9 +181,9 @@
 					}
 				},
 				error: function ( jqXHR, textStatus, errorThrown) {
-					// console.log(jqXHR);
-					// console.log(textStatus);
-					// console.log(errorThrown);
+					console.log(jqXHR);
+					console.log(textStatus);
+					console.log(errorThrown);
 					var resp = {
 						error_type: "ajax",
 						message: textStatus,
