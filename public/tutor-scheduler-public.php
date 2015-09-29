@@ -224,8 +224,10 @@ class Tutor_Scheduler_Public {
 
 			// Mail it
 			mail($to, $subject, $message, $headers);
+		}else{
+			$response['success'] = true;
+			$response['message'] = 'This appointment has already been cancelled. Thank you for trying again.';
 		}
-		$response['message'] = 'This appointment has already been cancelled. Thank you for trying again.';
 		return $response;
 	}
 
@@ -246,9 +248,10 @@ class Tutor_Scheduler_Public {
 				CURLOPT_RETURNTRANSFER => 1,
 				CURLOPT_URL => 'https://www.google.com/recaptcha/api/siteverify',
 				CURLOPT_POST => 1,
+				CURLOPT_RETURNTRANSFER => 1,
 				CURLOPT_POSTFIELDS => $rData
 		));
-		$recaptchaResponse = curl_exec($curl);
+		$recaptchaResponse = json_decode(curl_exec($curl));
 		curl_close($curl);
 
 		if($recaptchaResponse == false){
@@ -266,7 +269,7 @@ class Tutor_Scheduler_Public {
 				 * invalid-input-response	The response parameter is invalid or malformed.
 				 */
 				// $result["message"] = gettype($recaptchaResponse->success);
-				switch ($recaptchaResponse->{'error-codes'}) {
+				switch ($recaptchaResponse->{"error-codes"}) {
 					case 'missing-input-secret':
 						$result["message"] = 'The secret parameter is missing.'; break;
 					case 'invalid-input-secret':
@@ -276,7 +279,7 @@ class Tutor_Scheduler_Public {
 					case 'invalid-input-response':
 						$result["message"] = 'The response parameter is invalid or malformed.'; break;
 					default:
-						$result["message"] = 'Whatever.'; break;
+						$result["message"] = serialize($recaptchaResponse); break;
 				}
 			}else if($recaptchaResponse->success == true){
 				//Update the date_taken flag on this specific appointment
@@ -294,6 +297,7 @@ class Tutor_Scheduler_Public {
 					$result["message"] = "Could not connect to the database. Please try again later.";
 				}else{
 					$result["type"] = "success";
+					$result["event_id"] = $_REQUEST["event_id"];
 					//Save to booked events
 					$booked_data = array(
 											'event_ID' => $_POST["event_id"],
@@ -314,7 +318,7 @@ class Tutor_Scheduler_Public {
 		}else{
 			$result["type"] = "error";
 			$result["error_type"] = "recaptcha";
-			$result["message"] = 'Man, something went wrong with recaptcha. I really dont know what to say.';
+			$result["message"] = "Recaptcha response is a: " . gettype($recaptchaResponse);
 		}
 
 

@@ -123,7 +123,7 @@
 			 * Response types are as follows:
 			 * resp.type = ["db", "ajax", "race"];
 			 */
-			console.log(resp);
+			// console.log(resp);
 			$(".modal-success").addClass("bg-danger");
 			if (resp.error_type === "race") {
 				$(".before-ajax-request").addClass("hidden");
@@ -155,7 +155,7 @@
 				dataType: "json",
 				url: myAjax.ajaxurl,
 				data : {
-					recaptcha_response: 'g-recaptcha-response',
+					recaptcha_response: grecaptcha.getResponse(),
 					action: "confirm_tas_appointment",
 					event_id: confirmationForm.attr("data-eventID"),
 					nonce: confirmationForm.attr("data-nonce"),
@@ -172,7 +172,7 @@
 					program: $("#program").val()
 				},
 				success: function(resp) {
-					console.log("Success!");
+					// console.log("Success!");
 					if(resp.type == "success") {
 						self.ajaxSuccess(resp.event_id);
 					}
@@ -181,9 +181,9 @@
 					}
 				},
 				error: function ( jqXHR, textStatus, errorThrown) {
-					console.log(jqXHR);
-					console.log(textStatus);
-					console.log(errorThrown);
+					// console.log(jqXHR);
+					// console.log(textStatus);
+					// console.log(errorThrown);
 					var resp = {
 						error_type: "ajax",
 						message: textStatus,
@@ -206,6 +206,7 @@
 			$(".before-ajax-request").removeClass("hidden");
 			$(".after-ajax-success").addClass("hidden");
 			$(".after-ajax-race-error").addClass("hidden");
+			grecaptcha.reset();
 		},
 		loadBindings: function () {
 			var self = this;
