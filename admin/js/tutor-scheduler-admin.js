@@ -142,11 +142,12 @@
 			    	self.deleteEvent(calEvent);
 			    },
 			    events: function(start, end, timezone, callback){
-					if (editSingleEvent) {
-						callback(filteredTutorEvents.eventsJSON);
-					}else{
-						callback(filteredTutorEvents.parentEventJSON);
-					}
+					callback(filteredTutorEvents.eventsJSON);
+					// if (editSingleEvent) {
+					// 	callback(filteredTutorEvents.eventsJSON);
+					// }else{
+					// 	callback(filteredTutorEvents.parentEventJSON);
+					// }
 				}
 		    });
 		};
@@ -186,6 +187,7 @@
 			/**
 			 * Modify this function!!!
 			 */
+			 var tutorJSON = (typeof tutorJSON === 'undefined') ? {} : tutorJSON;
 			$.each(tutorJSON, function(i, tutorObject){
 				var tutorOptionTemplate = '<option value="'+tutorObject.id+'">'+tutorObject.first_name+' '+tutorObject.last_name+'</option>';
 				$("#tutor-list-m-courses").append(tutorOptionTemplate);
