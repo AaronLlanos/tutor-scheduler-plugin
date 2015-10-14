@@ -120,7 +120,7 @@ class Tutor_Scheduler_Public {
 		//Moment.js
 		wp_enqueue_script( 'moment', plugin_dir_url( __FILE__ ) . 'js/libs/moment.min.js', array(), '2.10.3', false );
 		//Bootstrap
-		wp_enqueue_script( 'bootstrap', plugin_dir_url( __FILE__ ) . 'js/libs/bootstrap.min.js', array( 'jquery' ), '3.3.5', false );
+		//Should not be loaded here because this is loaded through the bootstrap plugin
 		//FullCalendar
 		wp_enqueue_script( 'fullcalendar', plugin_dir_url( __FILE__ ) . 'js/libs/full-calendar.min.js', array( 'jquery', 'moment' ), '2.3.2', false );
 		//underscore
