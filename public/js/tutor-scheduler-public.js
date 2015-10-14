@@ -2,6 +2,8 @@
 	'use strict';
 
 	var filteredEventJSON = [];
+	// var coursesJSON = coursesJSON;
+	// var tutorsJSON = tutorsJSON;
 
 	var AddThisEventCustom = {
 		updateData: function (calEvent, selectedCourse) {
@@ -238,7 +240,8 @@
 		loadCourseNames: function () {
 			var optionTemplate;
 			var courseList = $("#course-select");
-			var sortedCoursesJSON = _.sortBy(coursesJSON, 'name');
+			var localCoursesJSON = (typeof coursesJSON === 'undefined' ? {} : coursesJSON);
+			var sortedCoursesJSON = _.sortBy(localCoursesJSON, 'name');
 			courseList.append('<option value="" selected>Select a course</option>');
 			$.each(sortedCoursesJSON, function (i, course) {
 				optionTemplate = '<option value="' + course.id + '">' + course.name + '</option>';
@@ -252,8 +255,9 @@
 			tutorsList.empty(); //Clear list
 			//Load all tutors
 			tutorsList.append('<option value="" selected>Select a tutor</option>');
+			var localTutorsJSON = (typeof tutorsJSON === 'undefined' ? {} : tutorsJSON);
 			if (courseID === (-1)){
-				filteredTutorJSON = tutorsJSON;
+				filteredTutorJSON = localTutorsJSON;
 			}else{
 				//Only load the tutors associated with the course ID from C2T
 				
@@ -263,7 +267,7 @@
 
 				var tutorToAdd;
 				$.each(tutorIDs, function (i, tutorID){
-					tutorToAdd = _.find(tutorsJSON, function(tutorObject){
+					tutorToAdd = _.find(localTutorsJSON, function(tutorObject){
 						return tutorObject.id === tutorID.tutor_ID;
 					});
 					filteredTutorJSON.push(tutorToAdd);
