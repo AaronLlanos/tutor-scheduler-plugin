@@ -212,7 +212,7 @@
 		},
 		loadBindings: function () {
 			var self = this;
-			$('.modal').on('hidden.bs.modal', function () {
+			$('#confirm-appointment-modal').on('hidden.bs.modal', function () {
 			    self.refreshModal();
 			});
 			$("#course-select").on('change', function(){
