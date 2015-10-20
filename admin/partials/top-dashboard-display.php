@@ -45,16 +45,14 @@
     	</div>
     </div>
     <h3 class="text-center">This plugin is powered by:</h3>
-    <div class="row" style="box-shadow: inset 0px 5px 25px black; background-color: #E0E0E0;">
-        <div class="container text-center" style="width: 90%; margin-top: 20px; margin-bottom: 20px;">
-            <a href="http://getbootstrap.com"><img src="<?php echo plugins_url( 'images/bootstrap.png', __DIR__ ); ?>"></a>
-            <a href="http://fullcalendar.io"><img src="<?php echo plugins_url( 'images/fullcalendar.png', __DIR__ ); ?>"></a>
-            <img src="<?php echo plugins_url( 'images/htmlcss.png', __DIR__ ); ?>">
-            <a href="http://jquery.com"><img src="<?php echo plugins_url( 'images/jquery.png', __DIR__ ); ?>"></a>
-            <a href="http://momentjs.com"><img src="<?php echo plugins_url( 'images/moment.png', __DIR__ ); ?>"></a>
-            <a href="http://php.net"><img src="<?php echo plugins_url( 'images/php.png', __DIR__ ); ?>"></a>
-            <a href="http://underscorejs.org"><img src="<?php echo plugins_url( 'images/underscore.png', __DIR__ ); ?>"></a>
-        </div>
+    <div class="well well-lg bg-primary">
+        <a href="http://getbootstrap.com"><img class="img-rounded" style="height: 100px; width: 100px;" src="<?php echo plugins_url( 'images/bootstrap.png', __DIR__ ); ?>"></a>
+        <a href="http://fullcalendar.io"><img class="img-rounded" style="height: 100px; width: 100px;" src="<?php echo plugins_url( 'images/fullcalendar.png', __DIR__ ); ?>"></a>
+        <img class="img-rounded" style="height: 100px; width: 100px;" src="<?php echo plugins_url( 'images/htmlcss.png', __DIR__ ); ?>">
+        <a href="http://jquery.com"><img class="img-rounded" style="height: 100px; width: 100px;" src="<?php echo plugins_url( 'images/jquery.png', __DIR__ ); ?>"></a>
+        <a href="http://momentjs.com"><img class="img-rounded" style="height: 100px; width: 100px;" src="<?php echo plugins_url( 'images/moment.png', __DIR__ ); ?>"></a>
+        <a href="http://php.net"><img class="img-rounded" style="height: 100px; width: 100px;" src="<?php echo plugins_url( 'images/php.png', __DIR__ ); ?>"></a>
+        <a href="http://underscorejs.org"><img class="img-rounded" style="height: 100px; width: 100px;" src="<?php echo plugins_url( 'images/underscore.png', __DIR__ ); ?>"></a>
     </div>
 
 
