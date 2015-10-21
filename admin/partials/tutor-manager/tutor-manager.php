@@ -99,7 +99,9 @@
 				return $this->manageCourses($studentID);
 			}
 			else if (strcmp($type, 'm_events') === 0) {
-
+				$studentID = $_POST["student_id"];
+				$updateSchedule = $this->updateSchedule($studentID, 'edit');
+				return $updateSchedule;
 			}
 			return $insertSuccess;
 		}
@@ -278,11 +280,11 @@
 			global $wpdb;
 			//Add dates to table
 			$events_table_name = $wpdb->prefix . 'tutor_scheduler_events';
+			$scheduleSQLFormat = array("%d", "%s", "%s", "%s", "%d", "%d");
+			$eventObject;
 
 			if (strcmp($updateType, 'add') == 0) {
 				$events = explode(", ", $_POST["schedule"]);
-				$scheduleSQLFormat = array("%d", "%s", "%s", "%s", "%d", "%d");
-				$eventObject;
 
 				foreach ($events as $eventObjectString){
 					$eventObj = json_decode(stripslashes($eventObjectString));
@@ -299,6 +301,37 @@
 						return false;
 					}
 
+				}
+			}else if (strcmp($updateType, 'edit') == 0){
+				$events = explode(", ", $_POST["edited_schedule"]);
+
+				foreach ($events as $eventObjectString){
+					$eventObj = json_decode(stripslashes($eventObjectString));
+					if (is_null($eventObj)) {
+						return true;
+					}else if ($eventObj->adding == true) {
+						$scheduleData = array(
+										'tutor_ID' => $studentID,
+										'title' => $eventObj->title,
+										'start' => $eventObj->start,
+										'end' => $eventObj->end,
+										'parent_ID' => $eventObj->id,
+										'date_taken' => 0
+									 );
+
+						if (!$wpdb->insert($events_table_name, $scheduleData, $scheduleSQLFormat)) {
+							return false;
+						}
+					}else{
+						if(!$wpdb->update(
+								$events_table_name,
+								array('date_taken' => 1),
+								array('tutor_ID' => $studentID, 'start' => $eventObj->start)
+							)){
+							$wpdb->print_error();
+							return false;
+						}
+					}
 				}
 			}else{
 				//Remove the events from the database

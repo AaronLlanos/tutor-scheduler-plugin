@@ -11,9 +11,10 @@
 
 	var filteredTutorEvents = {
 		eventsJSON: [], 
-		parentEventJSON: [],
 		largestParentID: -1,
-		recurrUntil: {}
+		editedEvents: [],
+		recurrUntil: {},
+		timeblock: 0 // These are in minutes
 	};
 	var filteredTutorCourses = {
 		registered: [],
@@ -25,17 +26,17 @@
 	var CourseManager = {
 		tempCourses: [],
 		loadBindings: function () {
-			$("#add-course-button").on("click", function(){
+			$("#add-course-button").on("click", function (){
 				CourseManager.addCourse();
 			});
-			$("#add-course-input").keypress(function(event){
+			$("#add-course-input").keypress(function (event){
 				if ( event.which === 13 ) {
 					event.preventDefault();
 					$("#add-course-button").click();
 				}
 				
 			});
-			$(".course-remove").on("click", function(){
+			$(".course-remove").on("click", function (){
 				var confirmedVal = confirm("Are you sure you want to remove " + $(this).attr("data-name") + " from the table?");
 				if (confirmedVal === true) {
 					//Remove the course from the table
@@ -45,7 +46,7 @@
 				}
 			});
 		},
-		validateCourse: function(inputValue){
+		validateCourse: function (inputValue){
 			//Make sure it is not blank
 			if (inputValue.length === 0) {
 				return false;
@@ -54,14 +55,14 @@
 			
 			return true;
 		},
-		addCourseFormat: function(inputValue, addVal){
+		addCourseFormat: function (inputValue, addVal){
 			if (addVal){
 				return '<input id="'+inputValue+'" type="text" class="form-control hidden" value="add" name="'+inputValue+'">';
 			}else{
 				return '<input id="'+inputValue+'" type="text" class="form-control hidden" value="remove" name="'+inputValue+'">';
 			}
 		},
-		addCourse: function(){
+		addCourse: function (){
 			var inputValue = $("#add-course-input").val();
 			if (CourseManager.validateCourse(inputValue)) {
 				$("#temp-course-table")
@@ -79,40 +80,64 @@
 	function FullCalendar(identifier, hasHeader) {
 		this.identifier = identifier;
 		this.hasHeader = hasHeader;
+
+		if (this.hasHeader) {
+			this.hasHeader = {
+			    left:   'prev,next today',
+			    center: 'title',
+			    right:  'month,agendaWeek,agendaDay'
+			};
+		}
+
 		this.render = function(){
-			identifier.fullCalendar('render');
+			this.identifier.fullCalendar('render');
 		};
 
 		this.serializeDates = function(){
 			var schedule = '';
 			var newCalObject = {};
+			var input = $("input#schedule");
 			var scheduledDates = this.identifier.fullCalendar('clientEvents');
+			if ($("#edit-t-fullcalendar").is(this.identifier)){
+				scheduledDates = filteredTutorEvents.editedEvents;
+				input = $("input#edited_schedule");
+			}
 
 			$.each(scheduledDates, function(i, calObject){
+				if (typeof calObject.adding === 'undefined'){
+					calObject.adding = false;
+				}
 				newCalObject = {
 									start: calObject.start,
 									end: calObject.end,
 									title: calObject.title,
 									id: calObject.id,
+									adding: calObject.adding,
 									description: calObject.description
 								};
 				schedule += JSON.stringify(newCalObject)+", ";
 			});
 
-			$("input#schedule").val(schedule);
-			$("input#schedule").attr("size", schedule.length);
+			input.val(schedule);
+			input.attr("size", schedule.length);
 			
 			return true;
 
 		};
 		this.recurrDates = function(recurrUntil){
+			// console.log("In recurring.");
 			var self = this;
 			var start, end;
-			var scheduledDates = identifier.fullCalendar('clientEvents');
+			var scheduledDates = this.identifier.fullCalendar('clientEvents');
+			// console.log(scheduledDates);
 			var apptTimeBlocks = $("#time-to-add").val();
-			identifier.fullCalendar('removeEvents');
+			// This is so that we do not have duplicates on the front end and also to remove 
+			// any potential memory leaks
+			this.clearEvents();
 
 			recurrUntil = moment(recurrUntil, "YYYY-MM-DD").add({day: 1});
+
+			// console.log(recurrUntil);
 
 			$.each(scheduledDates, function(i, eventObject){
 				start = eventObject.start;
@@ -125,7 +150,7 @@
 		};
 		this.newCalendar = function () {
 			var self = this;
-			identifier.fullCalendar({
+			this.identifier.fullCalendar({
 		        // put your options and callbacks here
 		        header: self.hasHeader,
 		        columnFormat: 'dddd',
@@ -142,28 +167,33 @@
 			    	self.deleteEvent(calEvent);
 			    },
 			    events: function(start, end, timezone, callback){
-					callback(filteredTutorEvents.eventsJSON);
-					// if (editSingleEvent) {
-					// 	callback(filteredTutorEvents.eventsJSON);
-					// }else{
-					// 	callback(filteredTutorEvents.parentEventJSON);
-					// }
+			    	// console.log("in events");
+			    	// console.log(filteredTutorEvents.eventJSON);
+					callback(filteredTutorEvents.eventJSON);
 				}
 		    });
 		};
-		this.deleteEvent = function(calEvent){
-			identifier.fullCalendar('removeEvents', function(event){
+		this.deleteEvent = function (calEvent){
+			this.identifier.fullCalendar('removeEvents', function (event){
 				return event == calEvent;
 			});
+			// This compares if the current calendar is the editing calendar.
+			// If it is, we need to add the event object to the "Currently editing" events table.
+			if ($("#edit-t-fullcalendar").is(this.identifier)){
+				// Add it to the filteredTutorObjects variable.
+				TutorScheduler.checkIfEdited(calEvent, false);
+				// Add it to the DOM
+				TutorScheduler.editedEventsToDOM();
+			}
 		};
-		this.addNewEvent = function(customDate, id){
+		this.addNewEvent = function (customDate, id){
 
 			var tutorName = $("#first-name").val() + " " + $("#last-name").val();
 			var startTime = customDate.format();
 			var timeToAdd = $("#time-to-add").val();
 			var endTime = customDate.add({minutes: timeToAdd}).format();
-			//Assume no name is less than 4 characters, including the space seperating first and last
-			if (tutorName.length > 4){
+			//Assume no name is less than 3 characters, including the space seperating first and last
+			if (tutorName.length > 3){
 				var eventObject = {
 					id: id,
 					title: tutorName,
@@ -171,24 +201,84 @@
 					end: endTime,
 					description: "Tutoring with " + tutorName
 				}
-		        identifier.fullCalendar('renderEvent', eventObject, true);
+				// This compares if the current calendar is the editing calendar.
+				// If it is, we need to add the event object to the "Currently editing" events table.
+				if ($("#edit-t-fullcalendar").is(this.identifier)){
+					// Add it to the filteredTutorObjects variable.
+					TutorScheduler.checkIfEdited(eventObject, true);
+					// Add it to the DOM
+					TutorScheduler.editedEventsToDOM();
+				}
+				// Add it to the front end of the calendar using the Fullcalendar API.
+		        this.identifier.fullCalendar('renderEvent', eventObject, true);
 			}else{
 				alert("Please enter a name before scheduling times.")
 				$("#first-name").focus();
 			}
 
-		}
+		};
+		this.clearEvents = function () {
+			this.identifier.fullCalendar('removeEvents');
+		};
+		this.updateEvents = function () {
+			// console.log("Updating events!");
+			// console.log(this.identifier);
+			this.clearEvents();
+			this.identifier.fullCalendar('refetchEvents');
+		};
 	}
 
 	var TutorScheduler = {
+		// Check if an eventObject is already in the edited events array.
+		// If it is, remove it.
+		// It it isnt, add it. 
+		checkIfEdited: function (calEventObject, adding){
+			if(typeof calEventObject.start === 'object'){
+				calEventObject.start = calEventObject.start.format();
+				calEventObject.end = calEventObject.end.format();
+			}
+			// Object if it is in the array or undefined if it isnt.
+			var inArray = _.find(filteredTutorEvents.editedEvents, function (eventObject){
+				return calEventObject.start == eventObject.start;
+			});
+			if (typeof inArray === 'undefined'){
+				calEventObject.adding = adding;
+				filteredTutorEvents.editedEvents.push(calEventObject);
+			}else{
+				filteredTutorEvents.editedEvents = _.reject(filteredTutorEvents.editedEvents, function (eventObject){
+					return calEventObject.start == eventObject.start;
+				});
+			}
+		},
+		// When editing events this inputs the table 
+		editedEventsToDOM: function () {
+			var self = this;
+			var element = $("#edit-t-events");
+			element.html('');
+			$.each(filteredTutorEvents.editedEvents, function (i, eventObject){
+				var contextualClass = ''; // Contextual class refers to a Bootstrap HTML class
+				var editType = '';
+				if (eventObject.adding){
+					contextualClass = 'bg-success';
+					editType = 'add';
+				}else{
+					contextualClass = 'bg-danger';
+					editType = 'remove';
+				}
+				var eventTabletemplate = '<tr class="'+contextualClass+'" data-type="'+editType+'">';
+				eventTabletemplate += '<td>' + moment(eventObject.start).format("llll") + '</td>';
+				eventTabletemplate += '</tr>';
+				element.append(eventTabletemplate);
+			});
+		},
 
 		loadTutorNames: function (){
 			var self = this;
 			/**
-			 * Modify this function!!!
+			 * Modify this function!!! m m
 			 */
-			 var tutorJSON = (typeof tutorJSON === 'undefined') ? {} : tutorJSON;
-			$.each(tutorJSON, function(i, tutorObject){
+			 var localTutorJSON = (typeof tutorJSON === 'undefined') ? {} : tutorJSON;
+			$.each(localTutorJSON, function(i, tutorObject){
 				var tutorOptionTemplate = '<option value="'+tutorObject.id+'">'+tutorObject.first_name+' '+tutorObject.last_name+'</option>';
 				$("#tutor-list-m-courses").append(tutorOptionTemplate);
 				$("#tutor-list-m-events").append(tutorOptionTemplate);
@@ -211,37 +301,27 @@
 			var self = this;
 
 			var addTutorCalendar = new FullCalendar($('#add-t-fullcalendar'), false);
-			var editTutorCalendar = new FullCalendar($('#edit-t-fullcalendar'), false);
+			var editTutorCalendar = new FullCalendar($('#edit-t-fullcalendar'), true);
 			addTutorCalendar.newCalendar();
 			editTutorCalendar.newCalendar();
 			/**
 			 * Course Tutor Functions!
 			 */
 			$('.modal-body').on('change', '#edit-t-time-to-add', function(){
-				var timeToAdd = $(this).val();
-				$("#time-to-add").val(timeToAdd);
+				filteredTutorEvents.timeBlock = $(this).val();
+				$("#time-to-add").val(filteredTutorEvents.timeBlock);
+				$("#time-block-binding").html(filteredTutorEvents.timeBlock);
 			});
+			$('.modal-body').on('change', '#edit-t-recurr-until', function(){
+				filteredTutorEvents.recurrUntil = $(this).val();
+				$("#end-date-binding").html(moment(filteredTutorEvents.recurrUntil).format("LL"));
+			});
+
 			$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 			 	addTutorCalendar.render();
 				editTutorCalendar.render();
 				$("#first-name").val('');
 				$("#last-name").val('');
-			});
-			$("#calendar_pop").popover({
-				content: '<div id="fullcalendar_popover"></div>',
-				html: true
-			});
-			$("#calendar_pop").click(function(){
-				$('#fullcalendar_popover').fullCalendar({
-					editable: false,
-			        timezone: "America/Chicago",
-					dayClick: function (date, jsEvent, view) {
-						//Input the value into input.
-						$("#recurr_until").val(date.format());
-						//Close the popover
-						$("#calendar_pop").popover('hide');
-					}
-				});
 			});
 			$("#tutor-list-m-courses").on('change', function(){
 				var selectedTutorID = $(this).val();
@@ -253,49 +333,58 @@
 				var name = $("#tutor-list-m-events option:selected").text().split();
 				$("#first-name").val(name[0]);
 				$("#last-name").val(name[1]);
+				$("#edit_t_student_id").val(selectedTutorID);
+				// Remove all FullCalendar frontend events. This is mainly so that 
+				// frontend events created under one tutor do not accidentally make their way over to
+				// other tutors.
+				$("#edit-t-events").html('');
 				CustomInputFilters.updateEvents(selectedTutorID);
+				// Do they have events already set? If not, they need to have a time block.
+				// And they also need an end date.
 				if (filteredTutorEvents.eventJSON.length < 1) {
-					//Set modal title, body.
-					$(".modal .modal-title").html("Please Enter a Time Block");
-					$(".modal .modal-body").html('<select name="time-to-add" id="edit-t-time-to-add" class="form-control" form="student-form" required><option selected>Tutoring Time Block</option><option value="30">30 minutes</option><option value="60">60 minutes</option></select>');
-					//Pop up the modal. 
-					$('.modal').modal('toggle')
+					CustomInputFilters.toggleEditEventsModal();
 				}else{
 					var endTime = filteredTutorEvents.eventJSON[0].end;
 					var startTime = filteredTutorEvents.eventJSON[0].start;
 					var timeBlock =  moment(endTime).diff(startTime, 'minutes');
+					$("#time-to-add").val(timeBlock);
+					$("#time-block-binding").html(timeBlock);
 				}
+				/**
+				 * Need to add a refresher for the calendar
+				 */
+				
+				editTutorCalendar.updateEvents();
 			});
 
-			//Create a calendar
 			$("#add-student-form").submit(function(event){
 				//Serialize data for POST object before submit event
-				var recurrUntil = $("#recurr_until").val();
+				var recurrUntil = $("#recurr-until").val();
 
 				addTutorCalendar.recurrDates(recurrUntil);
 
 				if ( TutorScheduler.serializeCourses() === false ){
 					event.preventDefault();
 				}
-				if ( addTutorCalendar.serializeDates() === false ){
+				else if ( addTutorCalendar.serializeDates() === false ){
 					event.preventDefault();
 				}
-				this.submit();
+				else this.submit();
 			});
 
-			$("#edit-student-form").submit(function(event){
+			$("#edit-student-form").submit(function (event){
 				//Serialize data for POST object before submit event
-				var recurrUntil = $("#recurr_until").val();
+				// var recurrUntil = filteredTutorEvents.recurrUntil;
 
-				addTutorCalendar.recurrDates(recurrUntil);
-
-				if ( TutorScheduler.serializeCourses() === false ){
+				// editTutorCalendar.recurrDates(recurrUntil);
+				$.each(filteredTutorEvents.editedEvents, function (i, eventObject){
+					++filteredTutorEvents.largestParentID;
+					eventObject.id = filteredTutorEvents.largestParentID;
+				});
+				if ( editTutorCalendar.serializeDates() === false ){
 					event.preventDefault();
 				}
-				if ( addTutorCalendar.serializeDates() === false ){
-					event.preventDefault();
-				}
-				this.submit();
+				else this.submit();
 			});
 
 			$("#registered-courses").on('click', 'input.r-course-add', function(){
@@ -319,7 +408,7 @@
 				}
 			});
 
-			$("div").on("click", "input.course-highlight-checkbox", function(event){
+			$("div").on("click", "input.course-highlight-checkbox", function (event){
 				//For the check boxes of courses when adding a tutor
 				if ($(this).context.checked) {
 					$(this).parent().parent().addClass("success");
@@ -328,7 +417,7 @@
 				}
 			});
 
-			$("div").on("click", "input.course-highlight-danger", function(event){
+			$("div").on("click", "input.course-highlight-danger", function (event){
 				//For the check boxes of courses when adding a tutor
 				if ($(this).context.checked) {
 					$(this).parent().parent().addClass("danger");
@@ -352,6 +441,17 @@
 
 	//Course input functions
 	var CustomInputFilters = {
+
+		toggleEditEventsModal: function () {
+			//Set modal title
+			$(".modal .modal-title").html("It seems you don't have events available yet!");
+			//Set the time block selector.
+			$(".modal .modal-body").html('<select name="time-to-add" id="edit-t-time-to-add" class="form-control" form="student-form" required><option selected>Tutoring Time Block</option><option value="30">30 minutes</option><option value="60">60 minutes</option></select>');
+			//Need to add the date picker so that we can set a recurr until date.
+			$(".modal .modal-body").append('<input id="edit-t-recurr-until" type="date" placeholder="Choose an ending date.">');
+			//Pop up the modal. 
+			$('.modal').modal('toggle');
+		},
 		
 		loadCourseNames: function (tutorID) {
 			var courseToAdd = [];
@@ -364,15 +464,15 @@
 			filteredTutorCourses.registered = [];
 			filteredTutorCourses.notRegistered = coursesJSON;
 			//Get the IDs of the courses tied to the tutor ID.
-			var courseIDs = _.filter(C2TJSON, function(C2TRow){
+			var courseIDs = _.filter(C2TJSON, function (C2TRow){
 				return C2TRow.tutor_ID === tutorID;
 			});
 			//Filter out the courses which are registered and not registered.
-			$.each(courseIDs, function(i, C2TRow){
-				courseToAdd = _.filter(coursesJSON, function(coursesRow){
+			$.each(courseIDs, function (i, C2TRow){
+				courseToAdd = _.filter(coursesJSON, function (coursesRow){
 					return C2TRow.course_ID === coursesRow.id;
 				});
-				filteredTutorCourses.notRegistered = _.reject(filteredTutorCourses.notRegistered, function(coursesRow){
+				filteredTutorCourses.notRegistered = _.reject(filteredTutorCourses.notRegistered, function (coursesRow){
 					return C2TRow.course_ID === coursesRow.id;
 				});
 				$.merge(filteredTutorCourses.registered, courseToAdd);
@@ -385,7 +485,7 @@
 			 * Need to append these dates to the DOM.
 			 */
 			var htmlToAppend = '';
-			$.each(filteredTutorCourses.registered, function(i, course){
+			$.each(filteredTutorCourses.registered, function (i, course){
 				htmlToAppend += '<tr>';
 				htmlToAppend += '<td class="course-highlight">';
 				htmlToAppend += '<label style="display: block;">';
@@ -396,7 +496,7 @@
 			});
 			registeredCoursesDOM.append(htmlToAppend);
 			htmlToAppend = '';
-			$.each(filteredTutorCourses.notRegistered, function(i, course){
+			$.each(filteredTutorCourses.notRegistered, function (i, course){
 				htmlToAppend += '<tr>';
 				htmlToAppend += '<td class="course-highlight">';
 				htmlToAppend += '<label style="display: block;">';
@@ -412,7 +512,8 @@
 			var largestParentID = -1;
 			var yesterday = moment().subtract({day: 1});
 			var recurrUntil = moment().add({day: 1});
-			filteredTutorEvents.parentEventJSON = []; // Clear the JSON array so that it is now clean.
+			// Fill the eventJSON with only the events tied to the tutor ID.
+			// This function also filters out days that are in the past.
 			filteredTutorEvents.eventJSON = _.filter(eventJSON, function(eventObject){
 				if(eventObject.tutor_ID === tutorID){
 					largestParentID = Math.max(eventObject.parent_ID, largestParentID);
@@ -420,22 +521,12 @@
 						recurrUntil = moment(eventObject.start);
 					}
 				}
-				return eventObject.tutor_ID === tutorID && yesterday.isBefore(eventObject.start);
+				return eventObject.tutor_ID === tutorID && yesterday.isBefore(eventObject.start) && eventObject.date_taken == 0;
 			});
-			for (var i = largestParentID; i >= 0; i--) {
-				var parentToPush = _.find(filteredTutorEvents.eventJSON, function(eventObject){
-					//Parent ID is a String and i is a number.
-					// This comes as a string from the DB.
-					return eventObject.parent_ID == i; 	
-				});
-				filteredTutorEvents.parentEventJSON.push(parentToPush);
-			};
 			filteredTutorEvents.largestParentID = largestParentID;
 			filteredTutorEvents.recurrUntil = recurrUntil.format("YYYY-MM-DD");
-			/**
-			 * Need to add a refresher for the calendar
-			 */
-			console.log(filteredTutorEvents.recurrUntil);
+			filteredTutorEvents.editedEvents = [];
+			$("#end-date-binding").html(recurrUntil.format("LL"));
 		}
 
 	}

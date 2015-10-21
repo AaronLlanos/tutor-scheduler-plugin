@@ -1,6 +1,6 @@
 <h4>Add a Tutor</h4>
 <p><b>Note: * denotes required field</b></p>
-<form enctype="multipart/form-data" id="student-form" method="POST" action="<?php echo admin_url('admin.php?page=' . $this->tutor_slug . '&type=add'); ?>" role="form">
+<form enctype="multipart/form-data" id="add-student-form" method="POST" action="<?php echo admin_url('admin.php?page=' . $this->tutor_slug . '&type=add'); ?>" role="form">
 	<div class="row">
 		<div class="col-xs-6">
 			<div class="row">
@@ -63,9 +63,9 @@
 	<hr>
 	<div class="container">
 		<div class="col-xs-9">
-			<label for="recurr_until">Recurr Dates Until: (YYYY-MM-DD)</label>
-			<span id="calendar_pop">
-				<input id="recurr_until" name="recurr_until" type="text" autocomplete="off" required></input>
+			<label for="recurr-until">Recurr Dates Until:</label>
+			<span class="calendar_pop">
+				<input id="recurr-until" name="recurr-until" type="date" autocomplete="off" required></input>
 			</span>
 		</div>
 		<div class="col-xs-3 form-group">
