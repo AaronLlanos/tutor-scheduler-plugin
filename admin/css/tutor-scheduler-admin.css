@@ -2,6 +2,7 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+@import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css);
 
 h2 > span.dashicons.dashicons-calendar-alt{
 	height: 40px;
